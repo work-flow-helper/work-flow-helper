@@ -1,9 +1,8 @@
 package com.sparta.workflowhelper.domain.worker.entity;
 
 import com.sparta.workflowhelper.domain.card.entity.Card;
-import com.sparta.workflowhelper.domain.user.entity.User;
+import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,10 +24,10 @@ public class Worker extends TimeStamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "project_member_id")
+    private ProjectMember projectMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id")
