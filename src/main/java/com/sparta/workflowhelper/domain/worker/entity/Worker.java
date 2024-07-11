@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,21 @@ public class Worker extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id")
     private Card card;
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private Worker(User user, Card card) {
+        this.user = user;
+        this.card = card;
+    }
+
+    public static Worker createdWorker(User user, Card card) {
+        Worker worker = Worker.builder()
+                .user(user)
+                .card(card)
+                .build();
+
+        card.addWorker(worker);
+
+        return worker;
+    }
 }

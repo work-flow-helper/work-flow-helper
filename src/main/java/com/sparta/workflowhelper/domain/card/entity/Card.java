@@ -1,7 +1,9 @@
 package com.sparta.workflowhelper.domain.card.entity;
 
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
+import com.sparta.workflowhelper.domain.worker.entity.Worker;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,8 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,13 +35,43 @@ public class Card extends TimeStamped {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
+    private Integer position;
+
     private String content;
 
-    // deadline??
+    private LocalDateTime deadline;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stage_id", nullable = false)
     private Stage stage;
 
+    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Worker> workers = new ArrayList<>();
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private Card(String title, Integer position, String content, LocalDateTime deadline,
+            Stage stage) {
+        this.title = title;
+        this.position = position;
+        this.content = content;
+        this.deadline = deadline;
+        this.stage = stage;
+    }
+
+    public static Card createdCard(String title, Integer position, String content,
+            LocalDateTime deadline,
+            Stage stage) {
+        return Card.builder()
+                .title(title)
+                .position(position)
+                .content(content)
+                .deadline(deadline)
+                .stage(stage)
+                .build();
+    }
+
+    public void addWorker(Worker worker) {
+        this.workers.add(worker);
+    }
 }
