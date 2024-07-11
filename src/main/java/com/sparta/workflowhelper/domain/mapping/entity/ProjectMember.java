@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,25 @@ public class ProjectMember {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    public ProjectMember(Project project, User user) {
+        this.project = project;
+        this.user = user;
+    }
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private ProjectMember(User user, Project project) {
+        this.user = user;
+        this.project = project;
+    }
+
+    public static ProjectMember of(User user, Project project) {
+        ProjectMember projectMember = ProjectMember.builder()
+                .user(user)
+                .project(project)
+                .build();
+        project.addProjectMember(projectMember);
+        return projectMember;
+    }
+//
 }
