@@ -29,7 +29,7 @@ public class CardController {
 
         CardSimpleResponseDto responseDto = cardService.createdCard(requestDto,
                 userDetails.getUser());
-        
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponseDto.of(HttpStatus.CREATED.value(), "카드 등록 성공", responseDto));
     }

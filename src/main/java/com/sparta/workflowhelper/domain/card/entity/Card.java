@@ -60,8 +60,7 @@ public class Card extends TimeStamped {
     }
 
     public static Card createdCard(String title, Integer position, String content,
-            LocalDateTime deadline,
-            Stage stage) {
+            LocalDateTime deadline, Stage stage) {
         return Card.builder()
                 .title(title)
                 .position(position)

@@ -15,9 +15,4 @@ public class WorkerAdapter {
     public void saveAll(List<Worker> workers) {
         workerRepository.saveAll(workers);
     }
-
-    public boolean existsById(Long userId) {
-        return workerRepository.existsById(userId);
-    }
-
 }

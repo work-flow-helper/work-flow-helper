@@ -35,14 +35,14 @@ public class Worker extends TimeStamped {
     private Card card;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Worker(User user, Card card) {
-        this.user = user;
+    private Worker(ProjectMember projectMember, Card card) {
+        this.projectMember = projectMember;
         this.card = card;
     }
 
-    public static Worker createdWorker(User user, Card card) {
+    public static Worker createdWorker(ProjectMember projectMember, Card card) {
         Worker worker = Worker.builder()
-                .user(user)
+                .projectMember(projectMember)
                 .card(card)
                 .build();
 
