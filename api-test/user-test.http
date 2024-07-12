@@ -1,0 +1,10 @@
+### 값 미리 지정
+
+@cardId = 1
+
+### 단일조회
+GET http://localhost:8080/api/cards/{{cardId}}
+
+
+### 프로젝트내 모든 카드 조회
+GET http://localhost:8080/api/cards?projectId=1

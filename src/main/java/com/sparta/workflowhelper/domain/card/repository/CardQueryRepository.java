@@ -2,12 +2,15 @@ package com.sparta.workflowhelper.domain.card.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
+import com.sparta.workflowhelper.domain.card.dto.CardDetailQueryDto;
+import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.entity.QCard;
-import com.sparta.workflowhelper.domain.mapping.entity.QProjectMember;
+import com.sparta.workflowhelper.domain.project.entity.QProject;
+import com.sparta.workflowhelper.domain.stage.entity.QStage;
 import com.sparta.workflowhelper.domain.user.entity.QUser;
-import com.sparta.workflowhelper.domain.worker.dto.WorkerInfoDto;
+import com.sparta.workflowhelper.domain.worker.dto.WorkQueryDto;
 import com.sparta.workflowhelper.domain.worker.entity.QWorker;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -19,33 +22,66 @@ public class CardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public CardDetailResponseDto findCardDetailWithWorkers(Long cardId) {
-
+    public CardDetailQueryDto findCardDetail(Long cardId) {
         QCard card = QCard.card;
-        QWorker worker = QWorker.worker;
-        QProjectMember projectMember = QProjectMember.projectMember;
-        QUser user = QUser.user;
+        QStage stage = QStage.stage;
 
         return queryFactory
                 .select(Projections.constructor(
-                        CardDetailResponseDto.class,
-                        card.id,
-                        card.title,
-                        card.content,
-                        card.deadline,
-                        Projections.list(
-                                Projections.constructor(
-                                        WorkerInfoDto.class,
-                                        user.id,
-                                        user.nickname
-                                )
+                                CardDetailQueryDto.class,
+                                card.id,
+                                card.title,
+                                stage.title,
+                                card.content,
+                                card.deadline,
+                                card.position
                         )
-                ))
+                )
                 .from(card)
-                .leftJoin(card.workers, worker)
-                .leftJoin(worker.projectMember, projectMember)
-                .leftJoin(projectMember.user, user)
+                .leftJoin(card.stage, stage)
                 .where(card.id.eq(cardId))
                 .fetchOne();
+    }
+
+    public List<CardSimpleQueryDto> findAllCardByProjectId(Long projectId) {
+
+        QCard card = QCard.card;
+        QStage stage = QStage.stage;
+        QProject project = QProject.project;
+
+        return queryFactory
+                .select(Projections.constructor(
+                                CardSimpleQueryDto.class,
+                                card.id,
+                                card.title,
+                                stage.title,
+                                card.position
+                        )
+                )
+                .from(card)
+                .leftJoin(card.stage, stage)
+                .leftJoin(stage.project, project)
+                .where(card.stage.project.id.eq(projectId))
+                .fetch();
+    }
+
+    public List<WorkQueryDto> findWorkerInfo(Long cardId) {
+
+        QWorker worker = QWorker.worker;
+        QUser user = QUser.user;
+        QCard card = QCard.card;
+
+        return queryFactory
+                .select(Projections.constructor(
+                                WorkQueryDto.class,
+                                user.id,
+                                user.nickname
+                        )
+                )
+                .from(card)
+                .leftJoin(card.workers, worker)
+                .leftJoin(worker.user, user)
+                .where(card.id.eq(cardId))
+                .fetch();
     }
 }

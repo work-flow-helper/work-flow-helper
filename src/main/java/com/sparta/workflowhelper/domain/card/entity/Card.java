@@ -35,7 +35,7 @@ public class Card extends TimeStamped {
     @Column(nullable = false)
     private String title;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Integer position;
 
     private String content;
