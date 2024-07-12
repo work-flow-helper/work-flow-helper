@@ -14,15 +14,18 @@ public class CardSimpleResponseDto {
 
     private final String title;
 
+    private final String stageTitle;
+
     private final Integer position;
 
     private final List<WorkerInfoDto> workerInfoDtoList;
 
-    public static CardSimpleResponseDto of(Long cardId, String title, Integer position,
-            List<WorkerInfoDto> workerInfoDtoList) {
+    public static CardSimpleResponseDto of(Long cardId, String title, String stageTitle,
+            Integer position, List<WorkerInfoDto> workerInfoDtoList) {
         return CardSimpleResponseDto.builder()
                 .cardId(cardId)
                 .title(title)
+                .stageTitle(stageTitle)
                 .position(position)
                 .workerInfoDtoList(workerInfoDtoList)
                 .build();

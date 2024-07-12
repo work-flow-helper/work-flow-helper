@@ -1,7 +1,7 @@
 package com.sparta.workflowhelper.domain.worker.entity;
 
 import com.sparta.workflowhelper.domain.card.entity.Card;
-import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
+import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,22 +27,22 @@ public class Worker extends TimeStamped {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_member_id")
-    private ProjectMember projectMember;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id")
     private Card card;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Worker(ProjectMember projectMember, Card card) {
-        this.projectMember = projectMember;
+    private Worker(User user, Card card) {
+        this.user = user;
         this.card = card;
     }
 
-    public static Worker createdWorker(ProjectMember projectMember, Card card) {
+    public static Worker createdWorker(User user, Card card) {
         Worker worker = Worker.builder()
-                .projectMember(projectMember)
+                .user(user)
                 .card(card)
                 .build();
 

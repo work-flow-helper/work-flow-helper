@@ -2,11 +2,13 @@ package com.sparta.workflowhelper.domain.card.controller;
 
 import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
+import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
 import com.sparta.workflowhelper.domain.card.service.CardService;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,6 +49,17 @@ public class CardController {
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 단일 조회 성공",
+                        responseDto));
+    }
+
+    @GetMapping("/cards")
+    public ResponseEntity<CommonResponseDto<List<CardSimpleQueryDto>>> findAllCardByProjectId(
+            @RequestParam(required = true) Long projectId
+    ) {
+        List<CardSimpleQueryDto> responseDto = cardService.findAllCardByProjectId(projectId);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 전체 조회 성공",
                         responseDto));
     }
 }
