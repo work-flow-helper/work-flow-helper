@@ -2,7 +2,7 @@
 name: refactor 템플릿
 about: '기능 리팩토링 '
 title: "[REFACTOR] 리팩토링할 기능을 적어주세요 "
-labels: ''
+labels: "\U0001F528refactor"
 assignees: ''
 
 ---
