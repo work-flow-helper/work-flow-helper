@@ -6,6 +6,7 @@ import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +16,13 @@ public class StageService {
 
     private final StageAdapter stageAdapter;
 
+    // Stage 등록
     @Transactional
     public StageResponseDto createdStage(StageRequestDto requestDto) {
         var project = stageAdapter.findProjectById(requestDto.getProjectId());
         List<Stage> stages = stageAdapter.findStagesByProject(project);
 
-        int newPosition = calculateNewPosition(stages);
+        int newPosition = calculatedNewPosition(stages);
 
         Stage stage = new Stage(requestDto.getTitle(), newPosition, project);
 
@@ -34,7 +36,21 @@ public class StageService {
         );
     }
 
-    private int calculateNewPosition(List<Stage> stages) {
+    // Stage 전체 조회
+    @Transactional
+    public List<StageResponseDto> getAllStages() {
+        List<Stage> stages = stageAdapter.findAll();
+        return stages.stream()
+            .map(stage -> new StageResponseDto(
+                stage.getId(),
+                stage.getTitle(),
+                stage.getPosition(),
+                stage.getProject().getId()))
+            .collect(Collectors.toList());
+    }
+
+    // Stage의 Position 계산
+    private int calculatedNewPosition(List<Stage> stages) {
         if (stages.isEmpty()) {
             return 1;
         } else {

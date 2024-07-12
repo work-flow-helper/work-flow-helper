@@ -18,16 +18,24 @@ public class StageAdapter {
 
     private final ProjectRepository projectRepository;
 
+    // 프로젝트 ID가 존재하지 않으면 예외를 던짐
     public Project findProjectById(Long projectId) {
         return projectRepository.findById(projectId)
             .orElseThrow(() -> new ProjectNotFoundException(NotFoundErrorCode.NOT_FOUND_PROJECT_ENTITY.getMessage()));
     }
 
+    // Stage 엔티티를 데이터베이스에 저장
     public Stage save(Stage stage) {
         return stageRepository.save(stage);
     }
 
+    // 프로젝트와 연관된 모든 스테이지를 위치 순서대로 찾음
     public List<Stage> findStagesByProject(Project project) {
         return stageRepository.findByProjectOrderByPositionAsc(project);
+    }
+
+    // 모든 스테이지를 찾음
+    public List<Stage> findAll() {
+        return stageRepository.findAll();
     }
 }
