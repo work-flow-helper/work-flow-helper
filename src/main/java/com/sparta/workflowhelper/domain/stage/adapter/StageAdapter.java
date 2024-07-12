@@ -30,12 +30,12 @@ public class StageAdapter {
         return stageRepository.save(stage);
     }
 
-    // 프로젝트와 연관된 모든 스테이지를 위치 순서대로 찾음
+    // 프로젝트 내의 스테이지를 위치 순으로 조회
     public List<Stage> findStagesByProject(Project project) {
         return stageRepository.findByProjectOrderByPositionAsc(project);
     }
 
-    // 모든 스테이지를 찾음
+    // 스테이지 전체 조회
     public List<Stage> findAll() {
         return stageRepository.findAll();
     }
@@ -46,4 +46,8 @@ public class StageAdapter {
             .orElseThrow(() -> new StageNotFoundException(NotFoundErrorCode.NOT_FOUND_STAGE_ENTITY.getMessage()));
     }
 
+    // 스테이지 삭제
+    public void deletedStage(Stage stage) {
+        stageRepository.delete(stage);
+    }
 }

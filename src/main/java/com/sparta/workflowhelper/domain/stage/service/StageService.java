@@ -61,4 +61,11 @@ public class StageService {
             return lastPosition + 1;
         }
     }
+
+    @Transactional
+    public CommonResponseDto<Void> deletedStage(Long stageId) {
+        Stage stage = stageAdapter.findStageById(stageId);
+        stageAdapter.deletedStage(stage);
+        return new CommonResponseDto<>(200, "스테이지 삭제", null);
+    }
 }

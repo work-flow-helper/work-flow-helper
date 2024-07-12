@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,13 @@ public class StageController {
         @PathVariable Long stageId,
         @RequestBody StageRequestDto requestDto) {
         CommonResponseDto<StageResponseDto> responseDto = stageService.updatedStage(stageId, requestDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    // 스테이지 삭제
+    @DeleteMapping("/{stageId}")
+    public ResponseEntity<CommonResponseDto<Void>> deletedStage(@PathVariable Long stageId) {
+        CommonResponseDto<Void> responseDto = stageService.deletedStage(stageId);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
