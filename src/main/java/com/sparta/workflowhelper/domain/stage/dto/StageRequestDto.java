@@ -11,4 +11,8 @@ public class StageRequestDto {
 
     private String title;
 
+    // 생성자 오버로딩
+    public StageRequestDto(String title) {
+        this.title = title;
+    }
 }

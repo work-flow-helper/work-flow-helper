@@ -1,5 +1,6 @@
 package com.sparta.workflowhelper.domain.stage.service;
 
+import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
 import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
@@ -18,7 +19,7 @@ public class StageService {
 
     @Transactional
     public CommonResponseDto<StageResponseDto> createdStage(StageRequestDto requestDto) {
-        var project = stageAdapter.findProjectById(requestDto.getProjectId());
+        Project project = stageAdapter.findProjectById(requestDto.getProjectId());
         List<Stage> stages = stageAdapter.findStagesByProject(project);
 
         int newPosition = calculateNewPosition(stages);
@@ -38,6 +39,18 @@ public class StageService {
             .collect(Collectors.toList());
 
         return new CommonResponseDto<>(200, "스테이지 조회", responseDtos);
+    }
+
+    @Transactional
+    public CommonResponseDto<StageResponseDto> updatedStage(Long stageId,
+        StageRequestDto requestDto) {
+        Stage stage = stageAdapter.findStageById(stageId);
+        stage.updatedStage(requestDto.getTitle());
+        Stage updatedStage = stageAdapter.save(stage);
+
+        StageResponseDto responseDto = new StageResponseDto(updatedStage.getId(), updatedStage.getTitle());
+
+        return new CommonResponseDto<>(200, "스테이지 수정", responseDto);
     }
 
     private int calculateNewPosition(List<Stage> stages) {

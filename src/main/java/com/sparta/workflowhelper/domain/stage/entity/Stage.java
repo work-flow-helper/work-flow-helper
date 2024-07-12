@@ -45,4 +45,9 @@ public class Stage extends TimeStamped {
     public static Stage createdStage(String title, Integer position, Project project) {
         return new Stage(title, position, project);
     }
+
+    public void updatedStage(String title) {
+        this.title = title;
+    }
+
 }

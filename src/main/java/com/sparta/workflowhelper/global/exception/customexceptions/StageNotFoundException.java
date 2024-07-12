@@ -2,9 +2,10 @@ package com.sparta.workflowhelper.global.exception.customexceptions;
 
 import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.NotFoundException;
 
-public class ProjectNotFoundException extends NotFoundException {
+public class StageNotFoundException extends NotFoundException {
 
-    public ProjectNotFoundException(String message) {
+    public StageNotFoundException(String message) {
         super(message);
     }
+
 }

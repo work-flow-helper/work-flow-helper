@@ -5,6 +5,7 @@ import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
 import com.sparta.workflowhelper.domain.stage.repository.StageRepository;
 import com.sparta.workflowhelper.global.exception.customexceptions.ProjectNotFoundException;
+import com.sparta.workflowhelper.global.exception.customexceptions.StageNotFoundException;
 import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,4 +39,11 @@ public class StageAdapter {
     public List<Stage> findAll() {
         return stageRepository.findAll();
     }
+
+    // 스테이지 ID가 존재하지 않으면 예외를 던짐
+    public Stage findStageById(Long stageId) {
+        return stageRepository.findById(stageId)
+            .orElseThrow(() -> new StageNotFoundException(NotFoundErrorCode.NOT_FOUND_STAGE_ENTITY.getMessage()));
+    }
+
 }

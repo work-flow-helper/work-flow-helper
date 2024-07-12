@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +34,16 @@ public class StageController {
     @GetMapping
     public ResponseEntity<CommonResponseDto<List<StageResponseDto>>> getAllStages() {
         CommonResponseDto<List<StageResponseDto>> responseDto = stageService.getAllStages();
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+
+    // 스테이지 수정
+    @PutMapping("/{stageId}")
+    public ResponseEntity<CommonResponseDto<StageResponseDto>> updatedStage(
+        @PathVariable Long stageId,
+        @RequestBody StageRequestDto requestDto) {
+        CommonResponseDto<StageResponseDto> responseDto = stageService.updatedStage(stageId, requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
