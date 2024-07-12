@@ -1,9 +1,11 @@
 package com.sparta.workflowhelper.domain.card.service;
 
 import com.sparta.workflowhelper.domain.card.adapter.CardAdapter;
+import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
 import com.sparta.workflowhelper.domain.card.entity.Card;
+import com.sparta.workflowhelper.domain.card.repository.CardQueryRepository;
 import com.sparta.workflowhelper.domain.mapping.adapter.ProjectMemberAdapter;
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
 import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
@@ -17,9 +19,11 @@ import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j(topic = "CardService 기능")
 @Service
 @RequiredArgsConstructor
 public class CardService {
@@ -27,6 +31,7 @@ public class CardService {
     private static int count = 0;
 
     private final CardAdapter cardAdapter;
+    private final CardQueryRepository cardQueryRepository;
     private final StageAdapter stageAdapter;
     private final WorkerAdapter workerAdapter;
     private final ProjectMemberAdapter projectMemberAdapter;
@@ -37,7 +42,7 @@ public class CardService {
 
         Stage stage = stageAdapter.findById(requestDto.getStageId());
 
-        if (!projectMemberAdapter.existsByIdAndProjectId(user.getId(),
+        if (!projectMemberAdapter.existsByUserIdAndProjectId(user.getId(),
                 stage.getProject().getId())) {
             throw new ProjectMemberNotFoundException(
                     NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage());
@@ -50,11 +55,11 @@ public class CardService {
 
         Card savedCard = cardAdapter.save(card);
 
-        List<Worker> workerList = new ArrayList<>();
         List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
+        List<Worker> workerList = new ArrayList<>();
 
         for (Long workerId : requestDto.getWorkerIdList()) {
-            ProjectMember member = projectMemberAdapter.findByIdAndProjectId(workerId,
+            ProjectMember member = projectMemberAdapter.findByUserIdAndProjectId(workerId,
                     stage.getProject().getId());
             Worker worker = Worker.createdWorker(member, savedCard);
             workerList.add(worker);
@@ -66,6 +71,11 @@ public class CardService {
 
         return CardSimpleResponseDto.of(savedCard.getId(), savedCard.getTitle(),
                 savedCard.getPosition(), workerInfoDtoList);
+    }
+
+    @Transactional(readOnly = true)
+    public CardDetailResponseDto findCard(Long cardId) {
+        return cardQueryRepository.findCardDetailWithWorkers(cardId);
     }
 
     private Integer createdPositionNumber() {

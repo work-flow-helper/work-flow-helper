@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
 
-    Optional<ProjectMember> findByIdAndProjectId(Long workerId, Long projectId);
+    Optional<ProjectMember> findByUserIdAndProjectId(Long workerId, Long projectId);
 
-    boolean existsByIdAndProjectId(Long workerId, Long projectId);
+    boolean existsByUserIdAndProjectId(Long workerId, Long projectId);
 }

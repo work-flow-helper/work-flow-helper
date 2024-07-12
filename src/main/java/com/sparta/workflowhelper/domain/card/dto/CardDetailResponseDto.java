@@ -1,6 +1,7 @@
 package com.sparta.workflowhelper.domain.card.dto;
 
 import com.sparta.workflowhelper.domain.worker.dto.WorkerInfoDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,22 +9,25 @@ import lombok.Getter;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class CardSimpleResponseDto {
+public class CardDetailResponseDto {
 
     private final Long cardId;
 
     private final String title;
 
-    private final Integer position;
+    private final String content;
+
+    private final LocalDateTime deadline;
 
     private final List<WorkerInfoDto> workerInfoDtoList;
 
-    public static CardSimpleResponseDto of(Long cardId, String title, Integer position,
-            List<WorkerInfoDto> workerInfoDtoList) {
-        return CardSimpleResponseDto.builder()
+    public static CardDetailResponseDto of(Long cardId, String title, String content,
+            LocalDateTime deadline, List<WorkerInfoDto> workerInfoDtoList) {
+        return CardDetailResponseDto.builder()
                 .cardId(cardId)
                 .title(title)
-                .position(position)
+                .content(content)
+                .deadline(deadline)
                 .workerInfoDtoList(workerInfoDtoList)
                 .build();
     }
