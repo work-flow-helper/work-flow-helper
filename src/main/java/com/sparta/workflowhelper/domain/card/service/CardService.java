@@ -56,6 +56,12 @@ public class CardService {
         Card savedCard = cardAdapter.save(card);
 
         List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
+
+        if (requestDto.getWorkerIdList().isEmpty()) {
+            return CardSimpleResponseDto.of(savedCard.getId(), savedCard.getTitle(),
+                    savedCard.getPosition(), workerInfoDtoList);
+        }
+
         List<Worker> workerList = new ArrayList<>();
 
         for (Long workerId : requestDto.getWorkerIdList()) {
