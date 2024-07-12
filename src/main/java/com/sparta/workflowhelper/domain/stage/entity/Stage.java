@@ -25,7 +25,7 @@ public class Stage extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String title;
 
     @Column(unique = true, nullable = false)
@@ -34,5 +34,20 @@ public class Stage extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+
+    public Stage(String title, Integer position, Project project) {
+        this.title = title;
+        this.position = position;
+        this.project = project;
+    }
+
+    public static Stage createdStage(String title, Integer position, Project project) {
+        return new Stage(title, position, project);
+    }
+
+    public void updatedStage(String title) {
+        this.title = title;
+    }
 
 }
