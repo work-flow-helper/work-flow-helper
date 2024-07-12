@@ -47,6 +47,7 @@ public class User extends TimeStamped {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Column
     private String refreshToken;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -71,5 +72,9 @@ public class User extends TimeStamped {
                 .email(email)
                 .userRole(userRole)
                 .build();
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
