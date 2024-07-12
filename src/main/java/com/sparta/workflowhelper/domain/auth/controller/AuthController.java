@@ -34,9 +34,9 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<CommonResponseDto<String>> logIn(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+    public ResponseEntity<CommonResponseDto<String>> login(@Valid @RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
 
-        authService.logIn(requestDto, response);
+        authService.login(requestDto, response);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "로그인 성공"));

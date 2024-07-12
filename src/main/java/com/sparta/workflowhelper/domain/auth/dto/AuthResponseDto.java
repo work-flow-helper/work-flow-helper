@@ -8,11 +8,11 @@ import lombok.Getter;
 @Builder(access = AccessLevel.PRIVATE)
 public class AuthResponseDto {
 
-    private Long userId;
+    private final Long userId;
 
-    private String nickname;
+    private final String nickname;
 
-    private String email;
+    private final String email;
 
     public static AuthResponseDto of(Long userId, String nickname, String email) {
         return AuthResponseDto.builder()
