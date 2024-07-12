@@ -7,19 +7,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StageResponseDto {
 
-    private Long id;
+    private Long stageId;
 
     private String title;
 
-    private Integer position;
-
-    private Long projectId;
-
-    public StageResponseDto(Long id, String title, Integer position, Long projectId) {
-        this.id = id;
+    public StageResponseDto(Long stageId, String title) {
+        this.stageId = stageId;
         this.title = title;
-        this.position = position;
-        this.projectId = projectId;
     }
 
 }

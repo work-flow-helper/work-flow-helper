@@ -4,6 +4,7 @@ import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
 import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
+import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,44 +14,33 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class StageService {
-
     private final StageAdapter stageAdapter;
 
-    // Stage 등록
     @Transactional
-    public StageResponseDto createdStage(StageRequestDto requestDto) {
+    public CommonResponseDto<StageResponseDto> createdStage(StageRequestDto requestDto) {
         var project = stageAdapter.findProjectById(requestDto.getProjectId());
         List<Stage> stages = stageAdapter.findStagesByProject(project);
 
-        int newPosition = calculatedNewPosition(stages);
+        int newPosition = calculateNewPosition(stages);
 
-        Stage stage = new Stage(requestDto.getTitle(), newPosition, project);
-
+        Stage stage = Stage.createdStage(requestDto.getTitle(), newPosition, project);
         Stage savedStage = stageAdapter.save(stage);
 
-        return new StageResponseDto(
-            savedStage.getId(),
-            savedStage.getTitle(),
-            savedStage.getPosition(),
-            savedStage.getProject().getId()
-        );
+        StageResponseDto responseDto = new StageResponseDto(savedStage.getId(), savedStage.getTitle());
+        return new CommonResponseDto<>(201, "스테이지 등록", responseDto);
     }
 
-    // Stage 전체 조회
     @Transactional
-    public List<StageResponseDto> getAllStages() {
+    public CommonResponseDto<List<StageResponseDto>> getAllStages() {
         List<Stage> stages = stageAdapter.findAll();
-        return stages.stream()
-            .map(stage -> new StageResponseDto(
-                stage.getId(),
-                stage.getTitle(),
-                stage.getPosition(),
-                stage.getProject().getId()))
+        List<StageResponseDto> responseDtos = stages.stream()
+            .map(stage -> new StageResponseDto(stage.getId(), stage.getTitle()))
             .collect(Collectors.toList());
+
+        return new CommonResponseDto<>(200, "스테이지 조회", responseDtos);
     }
 
-    // Stage의 Position 계산
-    private int calculatedNewPosition(List<Stage> stages) {
+    private int calculateNewPosition(List<Stage> stages) {
         if (stages.isEmpty()) {
             return 1;
         } else {

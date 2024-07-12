@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StageRequestDto {
 
-    private String title;
-
     private Long projectId;
+
+    private String title;
 
 }
