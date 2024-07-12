@@ -1,19 +1,27 @@
 package com.sparta.workflowhelper.domain.stage.dto;
 
+import com.sparta.workflowhelper.domain.stage.entity.Stage;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@Builder(access = AccessLevel.PRIVATE)
 public class StageResponseDto {
 
-    private Long stageId;
+    private final Long stageId;
 
-    private String title;
+    private final String title;
 
-    public StageResponseDto(Long stageId, String title) {
-        this.stageId = stageId;
-        this.title = title;
+    public static StageResponseDto of(Long stageId, String title) {
+        return StageResponseDto.builder()
+            .stageId(stageId)
+            .title(title)
+            .build();
+    }
+
+    public static StageResponseDto from(Stage stage) {
+        return of(stage.getId(), stage.getTitle());
     }
 
 }
