@@ -19,17 +19,13 @@ public class ProjectMemberAdapter {
                         NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage()));
     }
 
-    public boolean existsById(Long userId) {
-        return projectMemberRepository.existsById(userId);
-    }
-
-    public ProjectMember findByIdAndProjectId(Long workerId, Long projectId) {
-        return projectMemberRepository.findByIdAndProjectId(workerId, projectId)
+    public ProjectMember findByUserIdAndProjectId(Long workerId, Long projectId) {
+        return projectMemberRepository.findByUserIdAndProjectId(workerId, projectId)
                 .orElseThrow(() -> new ProjectMemberNotFoundException(
                         NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage()));
     }
 
-    public boolean existsByIdAndProjectId(Long workerId, Long projectId) {
-        return projectMemberRepository.existsByIdAndProjectId(workerId, projectId);
+    public boolean existsByUserIdAndProjectId(Long workerId, Long projectId) {
+        return projectMemberRepository.existsByUserIdAndProjectId(workerId, projectId);
     }
 }
