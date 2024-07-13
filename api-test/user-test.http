@@ -131,6 +131,6 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "stageId": 1,
+  "stageId": 3,
   "newPosition": 1
 }

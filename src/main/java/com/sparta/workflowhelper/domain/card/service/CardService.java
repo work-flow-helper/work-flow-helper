@@ -212,18 +212,18 @@ public class CardService {
         if (newPosition > oldPosition) {
             for (Card card : cardList) {
                 if (card.getPosition() > oldPosition && card.getPosition() <= newPosition) {
-                    card.updatePosition(card.getPosition() - 1);
+                    card.updatePositionNumber(card.getPosition() - 1);
                 }
             }
         } else if (newPosition < oldPosition) {
             for (Card card : cardList) {
                 if (card.getPosition() >= newPosition && card.getPosition() < oldPosition) {
-                    card.updatePosition(card.getPosition() + 1);
+                    card.updatePositionNumber(card.getPosition() + 1);
                 }
             }
         }
 
-        moveCard.updatePosition(newPosition);
+        moveCard.updatePosition(newPosition, stage);
 
         return CardSimpleResponseDto.of(moveCard.getId(), moveCard.getTitle(),
                 moveCard.getStage().getTitle(), moveCard.getPosition()
