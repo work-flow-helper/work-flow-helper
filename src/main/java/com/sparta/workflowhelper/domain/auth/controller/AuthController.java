@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.DeleteExchange;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -48,5 +47,14 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "회원탈퇴 성공"));
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<CommonResponseDto<String>> logout(HttpServletRequest request) {
+
+        authService.logout(request);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "로그아웃 성공"));
     }
 }
