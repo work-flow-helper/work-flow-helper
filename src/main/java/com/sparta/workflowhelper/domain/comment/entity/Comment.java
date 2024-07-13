@@ -48,4 +48,9 @@ public class Comment extends TimeStamped {
     public static Comment create(String content, User user, Card card) {
         return new Comment(content, user, card);
     }
+
+    // 댓글의 content를 수정하는 정적 팩토리 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

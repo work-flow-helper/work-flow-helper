@@ -9,7 +9,9 @@ import com.sparta.workflowhelper.domain.comment.entity.Comment;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +34,33 @@ public class CommentService {
 
         CommentResponseDto responseDto = CommentResponseDto.from(savedComment);
         return CommonResponseDto.of(201, "댓글 등록", responseDto);
+    }
+
+    @Transactional(readOnly = true)
+    public CommonResponseDto<List<CommentResponseDto>> getComment() {
+        List<Comment> comments = commentAdapter.findAll();
+        List<CommentResponseDto> responseDtos = comments.stream()
+            .map(CommentResponseDto::from)
+            .collect(Collectors.toList());
+
+        return CommonResponseDto.of(200, "댓글 전체 조회", responseDtos);
+    }
+
+    @Transactional
+    public CommonResponseDto<CommentResponseDto> updateComment(Long commentId, CommentRequestDto requestDto) {
+        Comment comment = commentAdapter.findById(commentId);
+        comment.updateContent(requestDto.getContent());
+        Comment updatedComment = commentAdapter.save(comment);
+
+        CommentResponseDto responseDto = CommentResponseDto.from(updatedComment);
+        return CommonResponseDto.of(200, "댓글 수정", responseDto);
+    }
+
+    @Transactional
+    public CommonResponseDto<Void> deleteComment(Long commentId) {
+        Comment comment = commentAdapter.findById(commentId);
+        commentAdapter.delete(comment);
+
+        return CommonResponseDto.of(204, "댓글 삭제 완료");
     }
 }
