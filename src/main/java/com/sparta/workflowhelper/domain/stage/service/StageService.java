@@ -2,6 +2,7 @@ package com.sparta.workflowhelper.domain.stage.service;
 
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
+import com.sparta.workflowhelper.domain.stage.dto.StagePositionRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
@@ -42,10 +43,10 @@ public class StageService {
     }
 
     @Transactional
-    public CommonResponseDto<StageResponseDto> updatedStage(Long stageId,
+    public CommonResponseDto<StageResponseDto> updateStage(Long stageId,
         StageRequestDto requestDto) {
         Stage stage = stageAdapter.findStageById(stageId);
-        stage.updatedStage(requestDto.getTitle());
+        stage.updateStage(requestDto.getTitle());
         Stage updatedStage = stageAdapter.save(stage);
 
         StageResponseDto responseDto = StageResponseDto.from(updatedStage);
@@ -54,10 +55,33 @@ public class StageService {
     }
 
     @Transactional
-    public CommonResponseDto<Void> deletedStage(Long stageId) {
+    public CommonResponseDto<Void> deleteStage(Long stageId) {
         Stage stage = stageAdapter.findStageById(stageId);
-        stageAdapter.deletedStage(stage);
+        stageAdapter.deleteStage(stage);
         return new CommonResponseDto<>(200, "스테이지 삭제", null);
+    }
+
+    @Transactional
+    public CommonResponseDto<StageResponseDto> moveStage(Long stageId, StagePositionRequestDto requestDto) {
+        Stage stage = stageAdapter.findStageById(stageId);
+        Project project = stage.getProject();
+        List<Stage> stages = stageAdapter.findStagesByProject(project);
+
+        int newPosition = requestDto.getPosition();
+        if (newPosition < 1 || newPosition > stages.size()) {
+            throw new IllegalArgumentException("잘못된 위치입니다.");
+        }
+
+        stages.remove(stage);
+        stages.add(newPosition - 1, stage);
+
+        for (int i = 0; i < stages.size(); i++) {
+            stages.get(i).updatePosition(i + 1);
+            stageAdapter.save(stages.get(i));
+        }
+
+        StageResponseDto responseDto = StageResponseDto.from(stage);
+        return new CommonResponseDto<>(200, "스테이지 위치 수정", responseDto);
     }
 
     private int calculateNewPosition(List<Stage> stages) {

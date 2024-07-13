@@ -47,7 +47,7 @@ public class StageAdapter {
     }
 
     // 스테이지 삭제
-    public void deletedStage(Stage stage) {
+    public void deleteStage(Stage stage) {
         stageRepository.delete(stage);
     }
 }

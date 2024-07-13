@@ -1,5 +1,6 @@
 package com.sparta.workflowhelper.domain.stage.controller;
 
+import com.sparta.workflowhelper.domain.stage.dto.StagePositionRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.service.StageService;
@@ -26,7 +27,7 @@ public class StageController {
 
     // 스테이지 생성
     @PostMapping
-    public ResponseEntity<CommonResponseDto<StageResponseDto>> createStage(@RequestBody StageRequestDto requestDto) {
+    public ResponseEntity<CommonResponseDto<StageResponseDto>> createdStage(@RequestBody StageRequestDto requestDto) {
         CommonResponseDto<StageResponseDto> responseDto = stageService.createdStage(requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -41,17 +42,26 @@ public class StageController {
 
     // 스테이지 수정
     @PutMapping("/{stageId}")
-    public ResponseEntity<CommonResponseDto<StageResponseDto>> updatedStage(
+    public ResponseEntity<CommonResponseDto<StageResponseDto>> updateStage(
         @PathVariable Long stageId,
         @RequestBody StageRequestDto requestDto) {
-        CommonResponseDto<StageResponseDto> responseDto = stageService.updatedStage(stageId, requestDto);
+        CommonResponseDto<StageResponseDto> responseDto = stageService.updateStage(stageId, requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 스테이지 삭제
     @DeleteMapping("/{stageId}")
-    public ResponseEntity<CommonResponseDto<Void>> deletedStage(@PathVariable Long stageId) {
-        CommonResponseDto<Void> responseDto = stageService.deletedStage(stageId);
+    public ResponseEntity<CommonResponseDto<Void>> deleteStage(@PathVariable Long stageId) {
+        CommonResponseDto<Void> responseDto = stageService.deleteStage(stageId);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    // 스테이지 순서 이동
+    @PutMapping("/{stageId}/position")
+    public ResponseEntity<CommonResponseDto<StageResponseDto>> moveStage(
+        @PathVariable Long stageId,
+        @RequestBody StagePositionRequestDto requestDto) {
+        CommonResponseDto<StageResponseDto> responseDto = stageService.moveStage(stageId, requestDto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }
