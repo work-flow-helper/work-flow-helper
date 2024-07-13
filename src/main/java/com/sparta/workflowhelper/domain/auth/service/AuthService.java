@@ -106,4 +106,20 @@ public class AuthService {
             SecurityContextHolder.clearContext();
         }
     }
+
+    public void logout(HttpServletRequest request) {
+
+        String logoutToken = jwtProvider.getJwtFromHeader(request, "Authorization");
+
+        jwtProvider.checkJwtToken(logoutToken);
+
+        String username = jwtProvider.getUserNameFromJwtToken(logoutToken);
+
+        User user = authAdapter.findByUsername(username);
+
+        user.updateRefreshToken(null);
+        authAdapter.save(user);
+        SecurityContextHolder.clearContext();
+
+    }
 }
