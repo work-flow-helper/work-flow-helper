@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,5 +79,15 @@ public class CardController {
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 수정 성공", responseDto));
+    }
+
+    @DeleteMapping("/cards/{cardId}")
+    public ResponseEntity<CommonResponseDto<String>> deletedCard(
+            @PathVariable Long cardId, @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        cardService.deletedCard(cardId, userDetails.getUser());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "카드 삭제 성공"));
     }
 }

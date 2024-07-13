@@ -17,7 +17,7 @@ public class ProjectQueryRepository {
     private final JPAQueryFactory queryFactory;
 
 
-    public List<ProjectMemberIdDto> findUserIdsByProjectId(Long projectId) {
+    public List<ProjectMemberIdDto> findProjectMemberIdLestByProjectId(Long projectId) {
 
         QProject project = QProject.project;
         QProjectMember projectMember = QProjectMember.projectMember;
