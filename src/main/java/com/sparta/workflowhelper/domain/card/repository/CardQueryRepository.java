@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.workflowhelper.domain.card.dto.CardDetailQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
+import com.sparta.workflowhelper.domain.card.entity.Card;
 import com.sparta.workflowhelper.domain.card.entity.QCard;
 import com.sparta.workflowhelper.domain.mapping.dto.ProjectMemberIdDto;
 import com.sparta.workflowhelper.domain.mapping.entity.QProjectMember;
@@ -64,6 +65,17 @@ public class CardQueryRepository {
                 .leftJoin(card.stage, stage)
                 .leftJoin(stage.project, project)
                 .where(card.stage.project.id.eq(projectId))
+                .fetch();
+    }
+
+    public List<Card> findAllCardByStageId(Long stageId) {
+        QCard card = QCard.card;
+        QStage stage = QStage.stage;
+
+        return queryFactory
+                .selectFrom(card)
+                .leftJoin(card.stage, stage)
+                .where(card.stage.id.eq(stageId))
                 .fetch();
     }
 

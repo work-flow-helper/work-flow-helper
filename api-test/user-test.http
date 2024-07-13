@@ -1,10 +1,78 @@
 ### 값 미리 지정
 
+# 일반 유저 정보 지정
+@username = user1234
+@password = Abcde1234!
+@nickname = nickname
+@email = user1@email.com
+
+# 매니저 유저 정보 지정
+@managerUsername = manager12
+@managerNickname = managername
+@managerEmail = manager1@email.com
+@adminCode = S3cur3Adm!nK3y#456
+
 @cardId = 1
+
+
+### 회원가입 (일반)
+POST http://localhost:8080/api/auth/sign-up
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}",
+  "nickname": "{{nickname}}",
+  "email": "{{email}}"
+}
+
+
+### 회원가입 (매니저)
+POST http://localhost:8080/api/auth/sign-up
+Content-Type: application/json
+
+{
+  "username": "{{managerUsername}}",
+  "password": "{{password}}",
+  "nickname": "{{managerNickname}}",
+  "email": "{{managerEmail}}",
+  "adminCode": "{{adminCode}}"
+}
+
+
+### 일반 유저 로그인 (토큰을 저장해서 다른테스트에 사용가능)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
+
+
+### 어드민 유저 로그인 (토큰을 저장해서 다른테스트에 사용가능)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{managerUsername}}",
+  "password":"{{password}}"
+}
+
+> {%
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+%}
 
 
 ### 카드 생성
 POST http://localhost:8080/api/cards
+Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
@@ -15,7 +83,7 @@ Content-Type: application/json
 
 ### 카드 생성
 POST http://localhost:8080/api/cards
-#Authorization: {{}}
+Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
@@ -38,6 +106,7 @@ GET http://localhost:8080/api/cards?projectId=1
 
 ### 카드 수정
 PUT http://localhost:8080/api/cards/{{cardId}}
+Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
@@ -47,3 +116,8 @@ Content-Type: application/json
     1
   ]
 }
+
+
+### 카드 삭제
+DELETE http://localhost:8080/api/cards/{{cardId}}
+Authorization: {{Authorization}}
