@@ -96,6 +96,7 @@ Content-Type: application/json
   ]
 }
 
+
 ### 단일조회
 GET http://localhost:8080/api/cards/{{cardId}}
 
@@ -113,11 +114,23 @@ Content-Type: application/json
   "title": "테스트",
   "content": "내용",
   "userIdList": [
-    1
+    1,
+    2
   ]
 }
 
 
 ### 카드 삭제
-DELETE http://localhost:8080/api/cards/{{cardId}}
+DELETE http://localhost:8080/api/cards/9
 Authorization: {{Authorization}}
+
+
+### 카드 순서 이동
+PUT http://localhost:8080/api/cards/{{cardId}}/position
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "stageId": 1,
+  "newPosition": 1
+}

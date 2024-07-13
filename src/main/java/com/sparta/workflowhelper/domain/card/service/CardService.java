@@ -37,8 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CardService {
 
-    private static int count = 0;
-
     private final CardAdapter cardAdapter;
     private final CardQueryRepository cardQueryRepository;
     private final StageAdapter stageAdapter;
@@ -49,7 +47,7 @@ public class CardService {
      * 카드 생성 로직
      *
      * @param requestDto 카드 상세 정보
-     * @param user       카드 작성자 (프로젝트에 참가한 맴버만 가능)
+     * @param user       카드 등록자
      * @return 카드의 간단한 정보
      */
     @Transactional
@@ -74,24 +72,20 @@ public class CardService {
         List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
 
         if (requestDto.getUserIdList() == null) {
-            return CardSimpleResponseDto.of(
-                    savedCard.getId(),
-                    savedCard.getTitle(),
-                    savedCard.getStage().getTitle(),
-                    savedCard.getPosition(),
-                    workerInfoDtoList);
+            return CardSimpleResponseDto.of(savedCard.getId(), savedCard.getTitle(),
+                    savedCard.getStage().getTitle(), savedCard.getPosition(), workerInfoDtoList);
         }
 
         Set<Long> inputUserIdSet = new HashSet<>(requestDto.getUserIdList());
 
-        workerInfoDtoList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
+        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
 
-        return CardSimpleResponseDto.of(
-                savedCard.getId(),
-                savedCard.getTitle(),
-                savedCard.getStage().getTitle(),
-                savedCard.getPosition(),
-                workerInfoDtoList);
+        workerList.forEach(worker -> workerInfoDtoList.add(
+                WorkerInfoDto.of(worker.getUser().getId(), worker.getUser().getNickname())
+        ));
+
+        return CardSimpleResponseDto.of(savedCard.getId(), savedCard.getTitle(),
+                savedCard.getStage().getTitle(), savedCard.getPosition(), workerInfoDtoList);
     }
 
     /**
@@ -107,14 +101,9 @@ public class CardService {
 
         List<WorkQueryDto> workQueryDto = cardQueryRepository.findWorkerInfo(cardId);
 
-        return CardDetailResponseDto.of(
-                cardQueryDto.getCardId(),
-                cardQueryDto.getTitle(),
-                cardQueryDto.getTitle(),
-                cardQueryDto.getContent(),
-                cardQueryDto.getDeadline(),
-                cardQueryDto.getPosition(),
-                workQueryDto
+        return CardDetailResponseDto.of(cardQueryDto.getCardId(), cardQueryDto.getTitle(),
+                cardQueryDto.getTitle(), cardQueryDto.getContent(), cardQueryDto.getDeadline(),
+                cardQueryDto.getPosition(), workQueryDto
         );
     }
 
@@ -159,21 +148,18 @@ public class CardService {
 
         inputUserIdSet.removeAll(WorkerUserIdSet);
 
-        List<WorkerInfoDto> workerInfoDtoList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet,
-                card);
+        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
+
+        workerSet.addAll(workerList);
+
+        List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
 
         workerSet.forEach(worker -> workerInfoDtoList.add(
                 WorkerInfoDto.of(worker.getUser().getId(), worker.getUser().getNickname())
         ));
 
-        return CardDetailResponseDto.of(
-                card.getId(),
-                card.getTitle(),
-                card.getTitle(),
-                card.getContent(),
-                card.getDeadline(),
-                card.getPosition(),
-                workerInfoDtoList
+        return CardDetailResponseDto.of(card.getId(), card.getTitle(), card.getTitle(),
+                card.getContent(), card.getDeadline(), card.getPosition(), workerInfoDtoList
         );
     }
 
@@ -217,8 +203,7 @@ public class CardService {
             stage = stageAdapter.findById(requestDto.getStageId());
         }
 
-        List<Card> cardList = cardQueryRepository.findAllCardByStageId(
-                stage.getId());
+        List<Card> cardList = cardQueryRepository.findAllCardByStageId(stage.getId());
 
         Integer newPosition = requestDto.getNewPosition();
 
@@ -240,25 +225,22 @@ public class CardService {
 
         moveCard.updatePosition(newPosition);
 
-        return CardSimpleResponseDto.of(
-                moveCard.getId(),
-                moveCard.getTitle(),
-                moveCard.getStage().getTitle(),
-                moveCard.getPosition()
+        return CardSimpleResponseDto.of(moveCard.getId(), moveCard.getTitle(),
+                moveCard.getStage().getTitle(), moveCard.getPosition()
         );
     }
 
     /**
-     * 작업자 생성후 저장하고 작업자의 정보를 리턴
+     * 작업자 생성후 저장하고 작업자를 리턴
      *
      * @param inputUserIdSet 작업자 추가를 진행할 유저의 고유번호 Set
      * @param card           작업자가 배정될 카드
-     * @return 작업자의 정보
+     * @return 작업자 엔티티
      */
-    private List<WorkerInfoDto> createdAndSaveWorkerAndGetDtoList(Set<Long> inputUserIdSet,
+    private List<Worker> createdAndSaveWorkerAndGetDtoList(Set<Long> inputUserIdSet,
             Card card) {
 
-        List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
+        List<Worker> workerList = new ArrayList<>();
 
         for (Long inputUserId : inputUserIdSet) {
 
@@ -268,10 +250,10 @@ public class CardService {
 
             worker.addWorkerInCard(card);
 
-            workerInfoDtoList.add(WorkerInfoDto.of(inputUserId, workerUser.getNickname()));
+            workerList.add(worker);
         }
 
-        return workerInfoDtoList;
+        return workerList;
     }
 
     /**
@@ -281,11 +263,9 @@ public class CardService {
      */
     private Integer createdPositionNumber(Stage stage) {
 
-        Integer position = count;
+        Integer lastCardPosition = cardQueryRepository.findLastPositionInStage(stage.getId());
 
-        count++;
-
-        return position;
+        return lastCardPosition + 1;
     }
 
     /**
@@ -295,6 +275,7 @@ public class CardService {
      * @param user   로그인한 유저
      */
     private void checkUserIsProjectMembers(Long cardId, User user) {
+
         List<ProjectMemberIdDto> projectMemberUserIdList =
                 cardQueryRepository.findProjectMemberIdListByCardId(cardId);
 
@@ -310,6 +291,7 @@ public class CardService {
      * @param userId                 작성, 수정, 삭제에 접근할 유저의 고유번호
      */
     private void checkUserIsProjectMembers(Set<Long> projectMemberUserIdSet, Long userId) {
+
         if (!projectMemberUserIdSet.contains(userId)) {
             throw new ProjectMemberNotFoundException(
                     NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage());
