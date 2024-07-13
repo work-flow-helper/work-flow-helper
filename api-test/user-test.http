@@ -2,9 +2,48 @@
 
 @cardId = 1
 
+
+### 카드 생성
+POST http://localhost:8080/api/cards
+Content-Type: application/json
+
+{
+  "stageId": 1,
+  "title": "테스트",
+  "content": "내용"
+}
+
+### 카드 생성
+POST http://localhost:8080/api/cards
+#Authorization: {{}}
+Content-Type: application/json
+
+{
+  "stageId": 1,
+  "title": "테스트",
+  "content": "내용",
+  "userIdList": [
+    1,
+    2
+  ]
+}
+
 ### 단일조회
 GET http://localhost:8080/api/cards/{{cardId}}
 
 
 ### 프로젝트내 모든 카드 조회
 GET http://localhost:8080/api/cards?projectId=1
+
+
+### 카드 수정
+PUT http://localhost:8080/api/cards/{{cardId}}
+Content-Type: application/json
+
+{
+  "title": "테스트",
+  "content": "내용",
+  "userIdList": [
+    1
+  ]
+}

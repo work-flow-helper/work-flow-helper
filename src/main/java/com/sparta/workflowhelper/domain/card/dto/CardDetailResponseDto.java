@@ -1,6 +1,5 @@
 package com.sparta.workflowhelper.domain.card.dto;
 
-import com.sparta.workflowhelper.domain.worker.dto.WorkQueryDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
@@ -9,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class CardDetailResponseDto {
+public class CardDetailResponseDto<T> {
 
     private final Long cardId;
 
@@ -23,12 +22,12 @@ public class CardDetailResponseDto {
 
     private final Integer position;
 
-    private final List<WorkQueryDto> workerInfoDtoList;
+    private final List<T> workerInfoDtoList;
 
-    public static CardDetailResponseDto of(Long cardId, String title, String stageTitle,
+    public static <T> CardDetailResponseDto<T> of(Long cardId, String title, String stageTitle,
             String content, LocalDateTime deadline, Integer position,
-            List<WorkQueryDto> workerInfoDtoList) {
-        return CardDetailResponseDto.builder()
+            List<T> workerInfoDtoList) {
+        return CardDetailResponseDto.<T>builder()
                 .cardId(cardId)
                 .title(title)
                 .stageTitle(stageTitle)

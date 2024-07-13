@@ -4,7 +4,6 @@ import com.sparta.workflowhelper.domain.card.entity.Card;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,11 +25,11 @@ public class Worker extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "card_id")
     private Card card;
 
@@ -41,13 +40,13 @@ public class Worker extends TimeStamped {
     }
 
     public static Worker createdWorker(User user, Card card) {
-        Worker worker = Worker.builder()
+        return Worker.builder()
                 .user(user)
                 .card(card)
                 .build();
+    }
 
-        card.addWorker(worker);
-
-        return worker;
+    public void addWorkerInCard(Card card) {
+        card.addWorker(this);
     }
 }

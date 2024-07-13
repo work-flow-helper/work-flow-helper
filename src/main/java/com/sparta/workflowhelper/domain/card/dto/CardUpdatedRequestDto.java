@@ -1,17 +1,13 @@
 package com.sparta.workflowhelper.domain.card.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class CardRequestDto {
-
-    @NotNull(message = "스테이지 고유번호는 필수 입력값 입니다.")
-    private Long stageId;
+public class CardUpdatedRequestDto {
 
     @NotBlank(message = "제목은 필수 입력값 입니다.")
     private String title;

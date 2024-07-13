@@ -5,6 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.workflowhelper.domain.card.dto.CardDetailQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.entity.QCard;
+import com.sparta.workflowhelper.domain.mapping.dto.ProjectMemberIdDto;
+import com.sparta.workflowhelper.domain.mapping.entity.QProjectMember;
 import com.sparta.workflowhelper.domain.project.entity.QProject;
 import com.sparta.workflowhelper.domain.stage.entity.QStage;
 import com.sparta.workflowhelper.domain.user.entity.QUser;
@@ -81,6 +83,30 @@ public class CardQueryRepository {
                 .from(card)
                 .leftJoin(card.workers, worker)
                 .leftJoin(worker.user, user)
+                .where(card.id.eq(cardId))
+                .fetch();
+    }
+
+
+    public List<ProjectMemberIdDto> findUserIdsByCardId(Long cardId) {
+        QCard card = QCard.card;
+        QStage stage = QStage.stage;
+        QProject project = QProject.project;
+        QProjectMember projectMember = QProjectMember.projectMember;
+        QUser user = QUser.user;
+
+        return queryFactory
+                .select(
+                        Projections.constructor(
+                                ProjectMemberIdDto.class,
+                                user.id
+                        )
+                )
+                .from(card)
+                .leftJoin(card.stage, stage)
+                .leftJoin(stage.project, project)
+                .leftJoin(project.projectMembers, projectMember)
+                .leftJoin(projectMember.user, user)
                 .where(card.id.eq(cardId))
                 .fetch();
     }
