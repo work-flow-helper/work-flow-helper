@@ -55,12 +55,12 @@ public class CardService {
 
         Stage stage = stageAdapter.findById(requestDto.getStageId());
 
-        List<ProjectMemberIdDto> projectMemberUserIdList = stageQueryRepository.findUserIdsByStageId(
-                stage.getId());
+        List<ProjectMemberIdDto> projectMemberUserIdList =
+                stageQueryRepository.findProjectMemberIdListByStageId(stage.getId());
 
         Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
 
-        checkUserInProjectMembers(projectMemberUserIdSet, user.getId());
+        checkUserIsProjectMembers(projectMemberUserIdSet, user.getId());
 
         Integer position = createdPositionNumber();
 
@@ -141,12 +141,7 @@ public class CardService {
 
         Card card = cardAdapter.findById(cardId);
 
-        List<ProjectMemberIdDto> projectMemberUserIdList = cardQueryRepository.findUserIdsByCardId(
-                card.getId());
-
-        Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
-
-        checkUserInProjectMembers(projectMemberUserIdSet, user.getId());
+        checkUserIsProjectMembers(card, user);
 
         card.updatedCard(requestDto.getTitle(), requestDto.getContent(), requestDto.getDeadline());
 
@@ -178,6 +173,21 @@ public class CardService {
                 card.getPosition(),
                 workerInfoDtoList
         );
+    }
+
+    /**
+     * 카드 삭제 기능
+     *
+     * @param cardId 삭제할 카드의 고유번호
+     * @param user   삭제를 진행할 유저
+     */
+    public void deletedCard(Long cardId, User user) {
+
+        Card card = cardAdapter.findById(cardId);
+
+        checkUserIsProjectMembers(card, user);
+
+        cardAdapter.delete(card);
     }
 
     /**
@@ -221,12 +231,27 @@ public class CardService {
     }
 
     /**
+     * 카드 수정, 삭제 권한에 접근하려는 로그인 유저가 프로젝트의 맴버인지 확인
+     *
+     * @param card 접근하려고 하는 카드
+     * @param user 로그인한 유저
+     */
+    private void checkUserIsProjectMembers(Card card, User user) {
+        List<ProjectMemberIdDto> projectMemberUserIdList =
+                cardQueryRepository.findProjectMemberIdListByCardId(card.getId());
+
+        Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
+
+        checkUserIsProjectMembers(projectMemberUserIdSet, user.getId());
+    }
+
+    /**
      * 작성, 수정, 삭제를 진행하는 유저가 프로젝트 맴버에 속하는지 확인
      *
      * @param projectMemberUserIdSet 프로젝트에 속한 유저의 고유번호 Set
      * @param userId                 작성, 수정, 삭제에 접근할 유저의 고유번호
      */
-    private void checkUserInProjectMembers(Set<Long> projectMemberUserIdSet, Long userId) {
+    private void checkUserIsProjectMembers(Set<Long> projectMemberUserIdSet, Long userId) {
         if (!projectMemberUserIdSet.contains(userId)) {
             throw new ProjectMemberNotFoundException(
                     NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage());
@@ -250,5 +275,4 @@ public class CardService {
 
         return projectMemberUserIdSet;
     }
-
 }

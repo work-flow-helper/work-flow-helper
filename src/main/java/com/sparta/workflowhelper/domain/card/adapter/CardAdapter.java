@@ -22,4 +22,8 @@ public class CardAdapter {
                 .orElseThrow(() -> new CardNotFoundException(
                         NotFoundErrorCode.NOT_FOUND_CARD_ENTITY.getMessage()));
     }
+
+    public void delete(Card card) {
+        cardRepository.delete(card);
+    }
 }

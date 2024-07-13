@@ -88,7 +88,7 @@ public class CardQueryRepository {
     }
 
 
-    public List<ProjectMemberIdDto> findUserIdsByCardId(Long cardId) {
+    public List<ProjectMemberIdDto> findProjectMemberIdListByCardId(Long cardId) {
         QCard card = QCard.card;
         QStage stage = QStage.stage;
         QProject project = QProject.project;

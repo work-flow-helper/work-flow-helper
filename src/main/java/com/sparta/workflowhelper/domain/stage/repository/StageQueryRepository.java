@@ -17,7 +17,7 @@ public class StageQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ProjectMemberIdDto> findUserIdsByStageId(Long stageId) {
+    public List<ProjectMemberIdDto> findProjectMemberIdListByStageId(Long stageId) {
         QStage stage = QStage.stage;
         QProject project = QProject.project;
         QProjectMember projectMember = QProjectMember.projectMember;
