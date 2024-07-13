@@ -122,4 +122,17 @@ public class CardQueryRepository {
                 .where(card.id.eq(cardId))
                 .fetch();
     }
+
+    public Integer findLastPositionInStage(Long stageId) {
+
+        QStage stage = QStage.stage;
+        QCard card = QCard.card;
+
+        return queryFactory
+                .select(card.position.max())
+                .from(card)
+                .leftJoin(card.stage, stage)
+                .where(card.stage.id.eq(stageId))
+                .fetchOne();
+    }
 }

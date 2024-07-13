@@ -80,7 +80,12 @@ public class Card extends TimeStamped {
         this.workers.add(worker);
     }
 
-    public void updatePosition(Integer position) {
+    public void updatePositionNumber(Integer position) {
         this.position = position;
+    }
+
+    public void updatePosition(Integer newPosition, Stage stage) {
+        this.position = newPosition;
+        this.stage = stage;
     }
 }
