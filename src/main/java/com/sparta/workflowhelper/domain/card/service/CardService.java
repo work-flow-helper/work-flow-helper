@@ -3,6 +3,7 @@ package com.sparta.workflowhelper.domain.card.service;
 import com.sparta.workflowhelper.domain.card.adapter.CardAdapter;
 import com.sparta.workflowhelper.domain.card.dto.CardDetailQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
+import com.sparta.workflowhelper.domain.card.dto.CardPositionRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
@@ -23,6 +24,7 @@ import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +64,7 @@ public class CardService {
 
         checkUserIsProjectMembers(projectMemberUserIdSet, user.getId());
 
-        Integer position = createdPositionNumber();
+        Integer position = createdPositionNumber(stage);
 
         Card card = Card.createdCard(requestDto.getTitle(), position, requestDto.getContent(),
                 requestDto.getDeadline(), stage);
@@ -139,9 +141,9 @@ public class CardService {
     public CardDetailResponseDto<WorkerInfoDto> updatedCard(Long cardId,
             CardUpdatedRequestDto requestDto, User user) {
 
-        Card card = cardAdapter.findById(cardId);
+        checkUserIsProjectMembers(cardId, user);
 
-        checkUserIsProjectMembers(card, user);
+        Card card = cardAdapter.findById(cardId);
 
         card.updatedCard(requestDto.getTitle(), requestDto.getContent(), requestDto.getDeadline());
 
@@ -181,13 +183,69 @@ public class CardService {
      * @param cardId 삭제할 카드의 고유번호
      * @param user   삭제를 진행할 유저
      */
+    @Transactional
     public void deletedCard(Long cardId, User user) {
+
+        checkUserIsProjectMembers(cardId, user);
 
         Card card = cardAdapter.findById(cardId);
 
-        checkUserIsProjectMembers(card, user);
-
         cardAdapter.delete(card);
+    }
+
+    /**
+     * 카드의 포지션을 변경하는 로직
+     *
+     * @param cardId     변경할 카드의 고유번호
+     * @param requestDto 어디로 변경을 진행할지 확인할 데이터
+     * @param user       변경을 진행할 유저
+     * @return 변경후 간단한 카드 정보 리턴
+     */
+    @Transactional
+    public CardSimpleResponseDto changeCardPosition(Long cardId, CardPositionRequestDto requestDto,
+            User user) {
+
+        checkUserIsProjectMembers(cardId, user);
+
+        Card moveCard = cardAdapter.findById(cardId);
+
+        Stage stage;
+
+        if (Objects.equals(moveCard.getStage().getId(), requestDto.getStageId())) {
+            stage = moveCard.getStage();
+        } else {
+            stage = stageAdapter.findById(requestDto.getStageId());
+        }
+
+        List<Card> cardList = cardQueryRepository.findAllCardByStageId(
+                stage.getId());
+
+        Integer newPosition = requestDto.getNewPosition();
+
+        Integer oldPosition = moveCard.getPosition();
+
+        if (newPosition > oldPosition) {
+            for (Card card : cardList) {
+                if (card.getPosition() > oldPosition && card.getPosition() <= newPosition) {
+                    card.updatePosition(card.getPosition() - 1);
+                }
+            }
+        } else if (newPosition < oldPosition) {
+            for (Card card : cardList) {
+                if (card.getPosition() >= newPosition && card.getPosition() < oldPosition) {
+                    card.updatePosition(card.getPosition() + 1);
+                }
+            }
+        }
+
+        moveCard.updatePosition(newPosition);
+
+        return CardSimpleResponseDto.of(
+                moveCard.getId(),
+                moveCard.getTitle(),
+                moveCard.getStage().getTitle(),
+                moveCard.getPosition()
+        );
     }
 
     /**
@@ -217,11 +275,11 @@ public class CardService {
     }
 
     /**
-     * 카드의 포지션 넘버를 정해주는 메서드 기능 (미완)
+     * 카드를 만들때 카드의 포지션을 해당 스테이지의 맨 마지막 번호로 만들어주는 메서드
      *
      * @return 포지션 번호
      */
-    private Integer createdPositionNumber() {
+    private Integer createdPositionNumber(Stage stage) {
 
         Integer position = count;
 
@@ -233,12 +291,12 @@ public class CardService {
     /**
      * 카드 수정, 삭제 권한에 접근하려는 로그인 유저가 프로젝트의 맴버인지 확인
      *
-     * @param card 접근하려고 하는 카드
-     * @param user 로그인한 유저
+     * @param cardId 접근하려고 하는 카드의 고유번호
+     * @param user   로그인한 유저
      */
-    private void checkUserIsProjectMembers(Card card, User user) {
+    private void checkUserIsProjectMembers(Long cardId, User user) {
         List<ProjectMemberIdDto> projectMemberUserIdList =
-                cardQueryRepository.findProjectMemberIdListByCardId(card.getId());
+                cardQueryRepository.findProjectMemberIdListByCardId(cardId);
 
         Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
 

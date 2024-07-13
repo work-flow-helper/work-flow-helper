@@ -79,4 +79,8 @@ public class Card extends TimeStamped {
     public void addWorker(Worker worker) {
         this.workers.add(worker);
     }
+
+    public void updatePosition(Integer position) {
+        this.position = position;
+    }
 }

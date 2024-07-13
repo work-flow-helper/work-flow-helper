@@ -1,6 +1,7 @@
 package com.sparta.workflowhelper.domain.card.controller;
 
 import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
+import com.sparta.workflowhelper.domain.card.dto.CardPositionRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
@@ -89,5 +90,17 @@ public class CardController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "카드 삭제 성공"));
+    }
+
+    @PutMapping("cards/{cardId}/position")
+    public ResponseEntity<CommonResponseDto<CardSimpleResponseDto>> changeCardPosition(
+            @PathVariable Long cardId, @Valid @RequestBody CardPositionRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        CardSimpleResponseDto responseDto = cardService.changeCardPosition(cardId, requestDto,
+                userDetails.getUser());
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 이동 성공", responseDto));
     }
 }
