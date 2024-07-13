@@ -3,6 +3,7 @@ package com.sparta.workflowhelper.domain.user.entity;
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import com.sparta.workflowhelper.global.common.enums.UserRole;
+import com.sparta.workflowhelper.global.common.enums.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,31 +51,41 @@ public class User extends TimeStamped {
     @Column
     private String refreshToken;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ProjectMember> projectMembers = new ArrayList<>();
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String username, String password, String nickname, String email,
+    private User(String username, String password, String nickname, String email, UserStatus userStatus,
             UserRole userRole) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+        this.userStatus = userStatus;
         this.userRole = userRole;
     }
 
-    public static User createdUser(String username, String password, String nickname, String email,
+    public static User createdUser(String username, String password, String nickname, String email, UserStatus userStatus,
             UserRole userRole) {
         return User.builder()
                 .username(username)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
+                .userStatus(userStatus)
                 .userRole(userRole)
                 .build();
     }
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateStatus(UserStatus status) {
+        this.userStatus = status;
     }
 }

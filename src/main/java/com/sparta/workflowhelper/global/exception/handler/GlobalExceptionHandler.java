@@ -1,6 +1,7 @@
 package com.sparta.workflowhelper.global.exception.handler;
 
 import com.sparta.workflowhelper.global.common.dto.CommonErrorResponseDto;
+import com.sparta.workflowhelper.global.exception.customexceptions.AlreadyWithdrawnException;
 import com.sparta.workflowhelper.global.exception.customexceptions.InvalidAdminCodeException;
 import com.sparta.workflowhelper.global.exception.customexceptions.UserDuplicateException;
 import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.NotFoundException;
@@ -33,6 +34,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserDuplicateException.class)
     public ResponseEntity<CommonErrorResponseDto<String>> handleUserDuplicateException(
             UserDuplicateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(CommonErrorResponseDto.of(HttpStatus.CONFLICT.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(AlreadyWithdrawnException.class)
+    public ResponseEntity<CommonErrorResponseDto<String>> handleAlreadyWithdrawnException(
+            AlreadyWithdrawnException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(CommonErrorResponseDto.of(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
