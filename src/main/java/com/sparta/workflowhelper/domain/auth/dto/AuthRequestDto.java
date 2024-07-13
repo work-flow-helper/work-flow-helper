@@ -24,8 +24,6 @@ public class AuthRequestDto {
     @Email(message = "이메일 형식만 가능합니다.")
     private String email;
 
-    private String refreshToken;
-
     private String adminCode;
 
 }
