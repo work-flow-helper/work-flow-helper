@@ -6,14 +6,15 @@ import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
+import com.sparta.workflowhelper.domain.card.dto.CardUpdatedRequestDto;
 import com.sparta.workflowhelper.domain.card.entity.Card;
 import com.sparta.workflowhelper.domain.card.repository.CardQueryRepository;
-import com.sparta.workflowhelper.domain.mapping.adapter.ProjectMemberAdapter;
+import com.sparta.workflowhelper.domain.mapping.dto.ProjectMemberIdDto;
 import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
+import com.sparta.workflowhelper.domain.stage.repository.StageQueryRepository;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
-import com.sparta.workflowhelper.domain.worker.adapter.WorkerAdapter;
 import com.sparta.workflowhelper.domain.worker.dto.WorkQueryDto;
 import com.sparta.workflowhelper.domain.worker.dto.WorkerInfoDto;
 import com.sparta.workflowhelper.domain.worker.entity.Worker;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,19 +40,25 @@ public class CardService {
     private final CardAdapter cardAdapter;
     private final CardQueryRepository cardQueryRepository;
     private final StageAdapter stageAdapter;
-    private final WorkerAdapter workerAdapter;
     private final UserAdapter userAdapter;
-    private final ProjectMemberAdapter projectMemberAdapter;
+    private final StageQueryRepository stageQueryRepository;
 
+    /**
+     * 카드 생성 로직
+     *
+     * @param requestDto 카드 상세 정보
+     * @param user       카드 작성자 (프로젝트에 참가한 맴버만 가능)
+     * @return 카드의 간단한 정보
+     */
     @Transactional
     public CardSimpleResponseDto createdCard(CardRequestDto requestDto, User user) {
 
         Stage stage = stageAdapter.findById(requestDto.getStageId());
 
-        List<Long> projectMemberUserIdList = projectMemberAdapter.findUserIdsByProjectId(
-                stage.getProject().getId());
+        List<ProjectMemberIdDto> projectMemberUserIdList = stageQueryRepository.findUserIdsByStageId(
+                stage.getId());
 
-        Set<Long> projectMemberUserIdSet = new HashSet<>(projectMemberUserIdList);
+        Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
 
         checkUserInProjectMembers(projectMemberUserIdSet, user.getId());
 
@@ -63,7 +71,7 @@ public class CardService {
 
         List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
 
-        if (requestDto.getWorkerIdList().isEmpty()) {
+        if (requestDto.getUserIdList() == null) {
             return CardSimpleResponseDto.of(
                     savedCard.getId(),
                     savedCard.getTitle(),
@@ -72,22 +80,9 @@ public class CardService {
                     workerInfoDtoList);
         }
 
-        List<Worker> workerList = new ArrayList<>();
+        Set<Long> inputUserIdSet = new HashSet<>(requestDto.getUserIdList());
 
-        for (Long workerId : requestDto.getWorkerIdList()) {
-
-            checkUserInProjectMembers(projectMemberUserIdSet, workerId);
-
-            User workerUser = userAdapter.findById(workerId);
-
-            Worker worker = Worker.createdWorker(workerUser, savedCard);
-
-            workerList.add(worker);
-
-            workerInfoDtoList.add(WorkerInfoDto.of(workerId, workerUser.getNickname()));
-        }
-
-        workerAdapter.saveAll(workerList);
+        workerInfoDtoList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
 
         return CardSimpleResponseDto.of(
                 savedCard.getId(),
@@ -97,8 +92,14 @@ public class CardService {
                 workerInfoDtoList);
     }
 
+    /**
+     * 카드 단일 조회
+     *
+     * @param cardId 조회할 카드의 고유번호
+     * @return 조회한 카드의 상세 정보
+     */
     @Transactional(readOnly = true)
-    public CardDetailResponseDto findCard(Long cardId) {
+    public CardDetailResponseDto<WorkQueryDto> findCard(Long cardId) {
 
         CardDetailQueryDto cardQueryDto = cardQueryRepository.findCardDetail(cardId);
 
@@ -115,11 +116,101 @@ public class CardService {
         );
     }
 
+    /**
+     * 프로젝트에 속한 카드 전체 조회
+     *
+     * @param projectId 조회할 프로젝트의 고유번호
+     * @return 프로젝트내의 모든 카드들의 간단한 정보
+     */
     @Transactional(readOnly = true)
     public List<CardSimpleQueryDto> findAllCardByProjectId(Long projectId) {
         return cardQueryRepository.findAllCardByProjectId(projectId);
     }
 
+    /**
+     * 카드 수정 기능
+     *
+     * @param cardId     수정할 카드의 고유 번호
+     * @param requestDto 수정할 카드의 내용들
+     * @param user       수정을 진행할 수정자 (프로젝트에 참가한 맴버만 가능)
+     * @return 수정한 카드의 상세 정보
+     */
+    @Transactional
+    public CardDetailResponseDto<WorkerInfoDto> updatedCard(Long cardId,
+            CardUpdatedRequestDto requestDto, User user) {
+
+        Card card = cardAdapter.findById(cardId);
+
+        List<ProjectMemberIdDto> projectMemberUserIdList = cardQueryRepository.findUserIdsByCardId(
+                card.getId());
+
+        Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
+
+        checkUserInProjectMembers(projectMemberUserIdSet, user.getId());
+
+        card.updatedCard(requestDto.getTitle(), requestDto.getContent(), requestDto.getDeadline());
+
+        Set<Worker> workerSet = card.getWorkers();
+
+        Set<Long> WorkerUserIdSet = workerSet.stream()
+                .map(worker -> worker.getUser().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> inputUserIdSet = new HashSet<>(requestDto.getUserIdList());
+
+        workerSet.removeIf(worker -> !inputUserIdSet.contains(worker.getUser().getId()));
+
+        inputUserIdSet.removeAll(WorkerUserIdSet);
+
+        List<WorkerInfoDto> workerInfoDtoList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet,
+                card);
+
+        workerSet.forEach(worker -> workerInfoDtoList.add(
+                WorkerInfoDto.of(worker.getUser().getId(), worker.getUser().getNickname())
+        ));
+
+        return CardDetailResponseDto.of(
+                card.getId(),
+                card.getTitle(),
+                card.getTitle(),
+                card.getContent(),
+                card.getDeadline(),
+                card.getPosition(),
+                workerInfoDtoList
+        );
+    }
+
+    /**
+     * 작업자 생성후 저장하고 작업자의 정보를 리턴
+     *
+     * @param inputUserIdSet 작업자 추가를 진행할 유저의 고유번호 Set
+     * @param card           작업자가 배정될 카드
+     * @return 작업자의 정보
+     */
+    private List<WorkerInfoDto> createdAndSaveWorkerAndGetDtoList(Set<Long> inputUserIdSet,
+            Card card) {
+
+        List<WorkerInfoDto> workerInfoDtoList = new ArrayList<>();
+
+        for (Long inputUserId : inputUserIdSet) {
+
+            User workerUser = userAdapter.findById(inputUserId);
+
+            Worker worker = Worker.createdWorker(workerUser, card);
+
+            worker.addWorkerInCard(card);
+
+            workerInfoDtoList.add(WorkerInfoDto.of(inputUserId, workerUser.getNickname()));
+        }
+
+        return workerInfoDtoList;
+    }
+
+    /**
+     * 카드의 포지션 넘버를 정해주는 메서드 기능 (미완)
+     *
+     * @return 포지션 번호
+     */
     private Integer createdPositionNumber() {
 
         Integer position = count;
@@ -129,10 +220,35 @@ public class CardService {
         return position;
     }
 
+    /**
+     * 작성, 수정, 삭제를 진행하는 유저가 프로젝트 맴버에 속하는지 확인
+     *
+     * @param projectMemberUserIdSet 프로젝트에 속한 유저의 고유번호 Set
+     * @param userId                 작성, 수정, 삭제에 접근할 유저의 고유번호
+     */
     private void checkUserInProjectMembers(Set<Long> projectMemberUserIdSet, Long userId) {
         if (!projectMemberUserIdSet.contains(userId)) {
             throw new ProjectMemberNotFoundException(
                     NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage());
         }
     }
+
+    /**
+     * 프로젝트에 속한 맴버의 고유번호 Id List -> Set 으로 변환
+     *
+     * @param projectMemberUserIdList QueryDSL 로 찾아온 프로젝트에 속한 맴버들의 id 리스트
+     * @return 맴버들의 id를 모아둔 Set
+     */
+    private Set<Long> convertToProjectMemberUserIdSet(
+            List<ProjectMemberIdDto> projectMemberUserIdList) {
+
+        Set<Long> projectMemberUserIdSet = new HashSet<>();
+
+        for (ProjectMemberIdDto projectMemberIdDto : projectMemberUserIdList) {
+            projectMemberUserIdSet.add(projectMemberIdDto.getUserId());
+        }
+
+        return projectMemberUserIdSet;
+    }
+
 }

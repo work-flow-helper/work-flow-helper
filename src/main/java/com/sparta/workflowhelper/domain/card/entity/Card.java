@@ -15,8 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class Card extends TimeStamped {
     private Stage stage;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Worker> workers = new ArrayList<>();
+    private Set<Worker> workers = new HashSet<>();
 
     @Builder(access = AccessLevel.PRIVATE)
     private Card(String title, Integer position, String content, LocalDateTime deadline,
@@ -68,6 +68,12 @@ public class Card extends TimeStamped {
                 .deadline(deadline)
                 .stage(stage)
                 .build();
+    }
+
+    public void updatedCard(String title, String content, LocalDateTime deadline) {
+        this.title = title;
+        this.content = content;
+        this.deadline = deadline;
     }
 
     public void addWorker(Worker worker) {

@@ -4,7 +4,10 @@ import com.sparta.workflowhelper.domain.card.dto.CardDetailResponseDto;
 import com.sparta.workflowhelper.domain.card.dto.CardRequestDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleQueryDto;
 import com.sparta.workflowhelper.domain.card.dto.CardSimpleResponseDto;
+import com.sparta.workflowhelper.domain.card.dto.CardUpdatedRequestDto;
 import com.sparta.workflowhelper.domain.card.service.CardService;
+import com.sparta.workflowhelper.domain.worker.dto.WorkQueryDto;
+import com.sparta.workflowhelper.domain.worker.dto.WorkerInfoDto;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -13,15 +16,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class CardController {
@@ -42,10 +46,10 @@ public class CardController {
     }
 
     @GetMapping("/cards/{cardId}")
-    public ResponseEntity<CommonResponseDto<CardDetailResponseDto>> findCard(
+    public ResponseEntity<CommonResponseDto<CardDetailResponseDto<WorkQueryDto>>> findCard(
             @PathVariable Long cardId
     ) {
-        CardDetailResponseDto responseDto = cardService.findCard(cardId);
+        CardDetailResponseDto<WorkQueryDto> responseDto = cardService.findCard(cardId);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 단일 조회 성공",
@@ -61,5 +65,18 @@ public class CardController {
         return ResponseEntity.ok()
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 전체 조회 성공",
                         responseDto));
+    }
+
+    @PutMapping("/cards/{cardId}")
+    public ResponseEntity<CommonResponseDto<CardDetailResponseDto<WorkerInfoDto>>> updatedCard(
+            @PathVariable Long cardId, @Valid @RequestBody CardUpdatedRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        CardDetailResponseDto<WorkerInfoDto> responseDto = cardService.updatedCard(cardId,
+                requestDto,
+                userDetails.getUser());
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "카드 수정 성공", responseDto));
     }
 }
