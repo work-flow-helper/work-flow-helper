@@ -4,6 +4,7 @@ import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import com.sparta.workflowhelper.global.common.enums.UserRole;
 import com.sparta.workflowhelper.global.common.enums.UserStatus;
+import com.sparta.workflowhelper.global.exception.customexceptions.AlreadyWithdrawnException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -92,5 +93,12 @@ public class User extends TimeStamped {
     public void updateProfile(String nickname, String email) {
         this.nickname = nickname;
         this.email = email;
+    }
+
+    public void checkUserWithdrawn() {
+        if (this.userStatus == UserStatus.WITHDRAWN) {
+            throw new AlreadyWithdrawnException("이미 탈퇴한 회원입니다.");
+        }
+
     }
 }
