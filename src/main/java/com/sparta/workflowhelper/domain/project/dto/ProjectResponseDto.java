@@ -1,6 +1,7 @@
 package com.sparta.workflowhelper.domain.project.dto;
 
 import com.sparta.workflowhelper.domain.project.entity.Project;
+import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,12 +13,20 @@ public class ProjectResponseDto {
     private final Long projectId;
     private final String title;
     private final String info;
+    private final String userNickName;
 
     public static ProjectResponseDto of(Long projectId, String title, String info) {
         return ProjectResponseDto.builder()
                 .projectId(projectId)
                 .title(title)
                 .info(info)
+                .build();
+    }
+
+    public static ProjectResponseDto memberOf(Long projectId, String userNickName) {
+        return ProjectResponseDto.builder()
+                .projectId(projectId)
+                .userNickName(userNickName)
                 .build();
     }
 }

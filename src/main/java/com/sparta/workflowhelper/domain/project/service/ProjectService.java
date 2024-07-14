@@ -3,6 +3,7 @@ package com.sparta.workflowhelper.domain.project.service;
 
 import com.sparta.workflowhelper.domain.mapping.adapter.ProjectMemberAdapter;
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
+import com.sparta.workflowhelper.domain.mapping.repository.ProjectMemberRepository;
 import com.sparta.workflowhelper.domain.project.adapter.ProjectAdapter;
 import com.sparta.workflowhelper.domain.project.dto.ProjectRequestDto;
 import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
@@ -10,6 +11,7 @@ import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
+import com.sparta.workflowhelper.domain.user.repository.UserRepository;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +24,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+    private ProjectMemberRepository projectMemberRepository;
     private ProjectAdapter projectAdapter;
     private ProjectRepository projectRepository;
     private ProjectMemberAdapter projectMemberAdapter;
     private UserAdapter userAdapter;
+    private UserRepository userRepository;
 
     public ProjectService(ProjectAdapter projectAdapter) {
         this.projectAdapter = projectAdapter;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public ProjectService(ProjectMemberRepository projectMemberRepository) {
+        this.projectMemberRepository = projectMemberRepository;
     }
 
 
@@ -74,6 +83,15 @@ public class ProjectService {
 
     public String deleteProject(Long projectId) {
         projectAdapter.deletedProjectMethod(projectId);
-        return "삭제 완료";
+        return "프로젝트 삭제";
+    }
+
+    public ProjectResponseDto addProjectMember(Long projectId, UserDetailsImpl userDetails) {
+        Project project = projectAdapter.findById(projectId);
+        User user = userRepository.findById(userDetails.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("해당 유저 없음")); // Exception 변경 리펙토링 내용 **
+        ProjectMember projectMember = ProjectMember.of(user, project);
+        projectMemberRepository.save(projectMember);
+        return ProjectResponseDto.memberOf(projectId, user.getNickname());
     }
 }

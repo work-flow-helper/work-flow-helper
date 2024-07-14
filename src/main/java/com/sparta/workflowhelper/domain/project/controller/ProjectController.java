@@ -102,8 +102,18 @@ public class ProjectController {
     }
 
     //Post add Participate User in Project
-    public ProjectResponseDto userAddProject() {
-        return null;
+    @PostMapping("/api/projects/{projectId}/members")
+    public ResponseEntity<CommonResponseDto<ProjectResponseDto>> addProjectMember(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity
+                .status(204)
+                .body(CommonResponseDto.of(
+                        HttpStatus.CREATED.value(),
+                        "프로젝트 멤버 등록",
+                        projectService.addProjectMember(projectId, userDetails)
+                        // ProjectMemberRepository Method add in findByProjectIdAndUserId
+                ));
     }
 
     //Delete Removing Participating User in Project
