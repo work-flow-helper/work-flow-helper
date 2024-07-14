@@ -9,6 +9,7 @@ import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
+import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,5 +51,14 @@ public class ProjectService {
     public ProjectResponseDto findProject(Long projectId) {
         Project project = projectAdapter.findById(projectId);
         return ProjectResponseDto.of(project.getId(), project.getTitle(), project.getInfo());
+    }
+
+    public List<ProjectResponseDto> readMyProjects(Long userId, UserDetailsImpl userDetails) {
+        return projectAdapter.findMyprojects(userId, userDetails);
+    }
+
+
+    public List<ProjectResponseDto> readAllProjects() {
+        return projectAdapter.findAllprojects();
     }
 }

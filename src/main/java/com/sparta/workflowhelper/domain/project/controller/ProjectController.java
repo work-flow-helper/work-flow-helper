@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -45,9 +47,30 @@ public class ProjectController {
                 ));
     }
 
+    //Get read MyProjects
+    @GetMapping("/projects/search")
+    public ResponseEntity<CommonResponseDto<List<ProjectResponseDto>>> readProjectsByUserId(
+            @RequestParam Long userId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseDto.of(
+                        HttpStatus.OK.value(),
+                        "사용자 프로젝트 조회",
+                        projectService.readMyProjects(userId, userDetails)
+                ));
+    }
+
     //Get Read All Project
-    public ProjectResponseDto readAllProject() {
-        return null;
+    @GetMapping("/projects")
+    public ResponseEntity<CommonResponseDto<List<ProjectResponseDto>>> getAllProjects() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseDto.of(
+                        HttpStatus.OK.value(),
+                        "프로젝트 전체 조회",
+                        projectService.readAllProjects()
+                ));
     }
 
     //Put Update Project

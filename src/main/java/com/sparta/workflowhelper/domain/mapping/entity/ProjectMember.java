@@ -2,6 +2,7 @@ package com.sparta.workflowhelper.domain.mapping.entity;
 
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.user.entity.User;
+import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,8 +20,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "project_members")
-public class ProjectMember {
-
+public class ProjectMember extends TimeStamped {
+    // 수정 사항 : 타임스탬프 상속받음
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
