@@ -7,7 +7,7 @@ import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class StageService {
         return new CommonResponseDto<>(201, "스테이지 등록", responseDto);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommonResponseDto<List<StageResponseDto>> getAllStages() {
         List<Stage> stages = stageAdapter.findAll();
         List<StageResponseDto> responseDtoList = stages.stream()
