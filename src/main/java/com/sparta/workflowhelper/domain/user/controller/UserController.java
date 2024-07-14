@@ -1,17 +1,16 @@
 package com.sparta.workflowhelper.domain.user.controller;
 
+import com.sparta.workflowhelper.domain.user.dto.UpdateProfileRequestDto;
 import com.sparta.workflowhelper.domain.user.dto.UserInfoResponseDto;
 import com.sparta.workflowhelper.domain.user.service.UserService;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,8 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<CommonResponseDto<UserInfoResponseDto>> getProfile(@PathVariable Long userId,
-          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<CommonResponseDto<UserInfoResponseDto>> getProfile(@PathVariable Long userId) {
 
         UserInfoResponseDto responseDto = userService.getProfile(userId);
 
@@ -39,5 +37,21 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "유저 전체 조회 성공", responseDto));
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<CommonResponseDto<UserInfoResponseDto>> updateProfile(@PathVariable Long userId,
+                                                                                @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                @Valid @RequestBody UpdateProfileRequestDto requestDto) {
+
+        if (!userId.equals(userDetails.getUser().getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(CommonResponseDto.of(HttpStatus.FORBIDDEN.value(), "본인의 프로필만 수정할 수 있습니다."));
+        }
+
+        UserInfoResponseDto responseDto = userService.updateProfile(userId, requestDto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "유저 프로필 수정", responseDto));
     }
 }
