@@ -7,6 +7,7 @@ import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class ProjectAdapter {
 
     public List<ProjectResponseDto> findMyprojects(Long userId, UserDetailsImpl userDetails) {
         if (!userId.equals(userDetails.getUser().getId())) {
-            throw new RuntimeException("권한이 없습니다.");
+            throw new RuntimeException("권한이 없습니다.");  // Exception 변경 리펙토링 내용 **
         } // 로그인한 유저와 요청하는 유저의 프로젝트 정보들이 다를 때
 //Project members에서 해당하는 유저 아이디에 해당하는 프로젝트 아이디를 찾아서 리스트에 추가
         List<ProjectMember> myProjects = projectMemberRepository.findByUserIdOrderByCreatedAtDesc(userId);
@@ -50,4 +51,13 @@ public class ProjectAdapter {
                 .map(e -> ProjectResponseDto.of(e.getId(), e.getTitle(), e.getInfo()))
                 .collect(Collectors.toList());
     }
+
+    public void deletedProjectMethod(Long projectId) {
+        try {
+            projectRepository.deleteById(projectId);
+        } catch (EmptyResultDataAccessException e) {   // Exception 변경 리펙토링 내용 **
+            throw new RuntimeException("해당 프로젝트가 없습니다." + projectId, e);
+        }
+    }
+
 }

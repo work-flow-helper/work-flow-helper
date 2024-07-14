@@ -2,6 +2,7 @@ package com.sparta.workflowhelper.domain.project.entity;
 
 
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
+import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import jakarta.persistence.CascadeType;
@@ -60,4 +61,9 @@ public class Project extends TimeStamped {
         this.projectMembers.add(projectMember);
     }
 
+    public void changeOf(String title, String info) {
+        this.title = title;
+        this.info = info;
+
+    }
 }

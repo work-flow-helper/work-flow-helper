@@ -7,6 +7,7 @@ import com.sparta.workflowhelper.domain.project.adapter.ProjectAdapter;
 import com.sparta.workflowhelper.domain.project.dto.ProjectRequestDto;
 import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.project.entity.Project;
+import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectService {
     private ProjectAdapter projectAdapter;
+    private ProjectRepository projectRepository;
     private ProjectMemberAdapter projectMemberAdapter;
     private UserAdapter userAdapter;
 
@@ -60,5 +62,18 @@ public class ProjectService {
 
     public List<ProjectResponseDto> readAllProjects() {
         return projectAdapter.findAllProjects();
+    }
+
+    @Transactional
+    public ProjectResponseDto updateProject(Long projectId, ProjectRequestDto projectRequestDto) {
+        Project findProject = projectAdapter.findById(projectId);
+        findProject.changeOf(projectRequestDto.getTitle(), projectRequestDto.getInfo());
+        projectRepository.save(findProject);
+        return ProjectResponseDto.of(findProject.getId(), findProject.getTitle(), findProject.getInfo());
+    }
+
+    public String deleteProject(Long projectId) {
+        projectAdapter.deletedProjectMethod(projectId);
+        return "삭제 완료";
     }
 }

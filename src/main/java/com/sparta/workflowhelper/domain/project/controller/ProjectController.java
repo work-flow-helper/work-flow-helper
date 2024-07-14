@@ -74,22 +74,37 @@ public class ProjectController {
     }
 
     //Put Update Project
-    public ProjectResponseDto updateProject() {
-        return null;
+    @PutMapping("/projects/{projectId}")
+    public ResponseEntity<CommonResponseDto<ProjectResponseDto>> putProject(
+            @PathVariable Long projectId,
+            @RequestBody ProjectRequestDto projectRequestDto
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseDto.of(
+                        HttpStatus.OK.value(),
+                        "프로젝트 수정",
+                        projectService.updateProject(projectId, projectRequestDto)
+                ));
     }
 
-    //Delete Soft Delete Project
-    public ProjectResponseDto deleteProject() {
-        return null;
+    //Delete Project
+    @DeleteMapping("/api/projects/{projectId}")
+    public ResponseEntity<CommonResponseDto<String>> deleteProject(@PathVariable Long projectId) {
+
+        return ResponseEntity
+                .status(204)
+                .body(CommonResponseDto.of(
+                        204,
+                        "프로젝트 삭제",
+                        projectService.deleteProject(projectId)
+                ));
     }
 
-    //Post User Participate Project
+    //Post add Participate User in Project
     public ProjectResponseDto userAddProject() {
         return null;
     }
 
-    //Delete Hard Delete Participating User
-    public ProjectResponseDto userDeleteProject() {
-        return null;
-    }
+    //Delete Removing Participating User in Project
 }
