@@ -40,7 +40,7 @@ public class AuthController {
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "로그인 성공"));
     }
 
-    @DeleteMapping("withdraw")
+    @DeleteMapping("/withdraw")
     public ResponseEntity<CommonResponseDto<String>> withdraw(HttpServletRequest request) {
 
         authService.withdraw(request);
@@ -49,12 +49,21 @@ public class AuthController {
                 .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "회원탈퇴 성공"));
     }
 
-    @PostMapping("logout")
+    @PostMapping("/logout")
     public ResponseEntity<CommonResponseDto<String>> logout(HttpServletRequest request) {
 
         authService.logout(request);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(CommonResponseDto.of(HttpStatus.NO_CONTENT.value(), "로그아웃 성공"));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<CommonResponseDto<String>> tokenReissue(HttpServletRequest request, HttpServletResponse response) {
+
+        authService.tokenReissue(request, response);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "토큰 재발행 성공"));
     }
 }
