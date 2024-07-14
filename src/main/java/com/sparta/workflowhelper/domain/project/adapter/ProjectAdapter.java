@@ -43,7 +43,11 @@ public class ProjectAdapter {
         //  .collect(Collectors.toList());  는 스트림의 요소를 수집하여 새로운 리스트를 생성하는 컬렉터
     }
 
-    public List<ProjectResponseDto> findAllprojects() {
-        return null;
+    public List<ProjectResponseDto> findAllProjects() {
+        return projectRepository // 맵을 이용해서 정적매서드를 통한 생성자역할이라 보면 된다.
+                .findAll()
+                .stream()
+                .map(e -> ProjectResponseDto.of(e.getId(), e.getTitle(), e.getInfo()))
+                .collect(Collectors.toList());
     }
 }

@@ -59,6 +59,6 @@ public class ProjectService {
 
 
     public List<ProjectResponseDto> readAllProjects() {
-        return projectAdapter.findAllprojects();
+        return projectAdapter.findAllProjects();
     }
 }
