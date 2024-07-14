@@ -31,11 +31,6 @@ public class UserAdapter {
         return userRepository.save(user);
     }
 
-    public User findById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
-    }
-
     public List<User> findAll() {
         return userRepository.findAll();
     }

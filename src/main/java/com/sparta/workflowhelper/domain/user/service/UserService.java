@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserAdapter userAdapter;
-    private final PasswordEncoder passwordEncoder;
 
     public UserInfoResponseDto getProfile(Long userId) {
 
