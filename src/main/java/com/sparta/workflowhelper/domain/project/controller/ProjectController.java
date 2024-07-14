@@ -6,6 +6,7 @@ import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.project.service.ProjectService;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,4 +118,17 @@ public class ProjectController {
     }
 
     //Delete Removing Participating User in Project
+    @DeleteMapping("/api/projects/{projectId}/members/{memberId}")
+    public ResponseEntity<CommonResponseDto<Null>> addProjectMember(
+            @PathVariable Long projectId,
+            @PathVariable Long memberId) {
+        projectService.deleteProjectMember(projectId, memberId);
+        return ResponseEntity
+                .status(204)
+                .body(CommonResponseDto.of(
+                        204,
+                        "프로젝트 멤버 삭제", null
+                        // ProjectMemberRepository Method add in findByProjectIdAndUserId
+                ));
+    }
 }

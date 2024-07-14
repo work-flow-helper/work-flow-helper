@@ -94,4 +94,10 @@ public class ProjectService {
         projectMemberRepository.save(projectMember);
         return ProjectResponseDto.memberOf(projectId, user.getNickname());
     }
+
+    public void deleteProjectMember(Long projectId, Long memberId) {
+        ProjectMember projectMember = projectMemberRepository.findByProjectIdAndUserId(projectId, memberId)
+                .orElseThrow(() -> new RuntimeException("해당 유저 없음"));// Exception 변경 리펙토링 내용 **
+        projectMemberRepository.delete(projectMember);
+    }
 }
