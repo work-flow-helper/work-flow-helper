@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -28,5 +30,14 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponseDto.of(HttpStatus.OK.value(), "유저 단일 조회 성공", responseDto));
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseDto<List<UserInfoResponseDto>>> getAllProfile() {
+
+        List<UserInfoResponseDto> responseDto = userService.getAllProfiles();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponseDto.of(HttpStatus.OK.value(), "유저 전체 조회 성공", responseDto));
     }
 }

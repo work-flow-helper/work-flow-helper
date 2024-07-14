@@ -7,6 +7,8 @@ import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class UserAdapter {
@@ -25,5 +27,9 @@ public class UserAdapter {
     public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
