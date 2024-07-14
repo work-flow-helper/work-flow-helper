@@ -44,8 +44,11 @@ public class ProjectService {
             projectMemberList.add(saveProjectMember);
         }
         projectMemberAdapter.saveAll(projectMemberList);
+        return ProjectResponseDto.of(project.getId(), project.getTitle(), project.getInfo());
+    }
 
-
+    public ProjectResponseDto findProject(Long projectId) {
+        Project project = projectAdapter.findById(projectId);
         return ProjectResponseDto.of(project.getId(), project.getTitle(), project.getInfo());
     }
 }

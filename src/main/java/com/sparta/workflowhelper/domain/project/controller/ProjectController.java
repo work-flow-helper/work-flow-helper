@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -36,8 +33,16 @@ public class ProjectController {
     }
 
     //Get Read Only One Project
-    public ProjectResponseDto readOnlyProject() {
-        return null;
+    @GetMapping("/projects/{projectId}")
+    public ResponseEntity<CommonResponseDto<ProjectResponseDto>> readOnlyProject(
+            @PathVariable Long projectId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseDto.of(
+                        HttpStatus.OK.value(),
+                        "프로젝트 단일 조회",
+                        projectService.findProject(projectId)
+                ));
     }
 
     //Get Read All Project
