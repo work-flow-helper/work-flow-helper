@@ -88,4 +88,9 @@ public class User extends TimeStamped {
     public void updateStatus(UserStatus status) {
         this.userStatus = status;
     }
+
+    public void updateProfile(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+    }
 }

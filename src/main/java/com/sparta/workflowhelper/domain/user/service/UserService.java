@@ -1,9 +1,11 @@
 package com.sparta.workflowhelper.domain.user.service;
 
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
+import com.sparta.workflowhelper.domain.user.dto.UpdateProfileRequestDto;
 import com.sparta.workflowhelper.domain.user.dto.UserInfoResponseDto;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserAdapter userAdapter;
+    private final PasswordEncoder passwordEncoder;
 
     public UserInfoResponseDto getProfile(Long userId) {
 
@@ -23,11 +26,16 @@ public class UserService {
     }
 
     public List<UserInfoResponseDto> getAllProfiles() {
+        return null;
+    }
 
-        List<User> users =userAdapter.findAll();
+    public UserInfoResponseDto updateProfile(Long userId, UpdateProfileRequestDto requestDto) {
 
-        return users.stream()
-                .map(user -> UserInfoResponseDto.of(user.getId(), user.getNickname(), user.getEmail()))
-                .collect(Collectors.toList());
+        User user = userAdapter.findById(userId);
+        user.updateProfile(requestDto.getNickname(), requestDto.getEmail());
+
+        userAdapter.save(user);
+
+        return UserInfoResponseDto.of(user.getId(), user.getNickname(), user.getEmail());
     }
 }
