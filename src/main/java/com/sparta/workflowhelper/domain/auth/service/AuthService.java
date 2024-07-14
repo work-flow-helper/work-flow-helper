@@ -68,6 +68,8 @@ public class AuthService {
 
         User user = authAdapter.findByUsername(requestDto.getUsername());
 
+        user.checkUserWithdrawn();
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
         );
@@ -99,9 +101,7 @@ public class AuthService {
         User user = authAdapter.findByUsername(username);
 
         if (user != null) {
-            if (user.getUserStatus() == UserStatus.WITHDRAWN) {
-                throw new AlreadyWithdrawnException(AlreadyWithdrawnErrorCode.ALREADY_WITHDRAWN.getMessage());
-            }
+            user.checkUserWithdrawn();
             user.updateStatus(UserStatus.WITHDRAWN);
             authAdapter.save(user);
             SecurityContextHolder.clearContext();
