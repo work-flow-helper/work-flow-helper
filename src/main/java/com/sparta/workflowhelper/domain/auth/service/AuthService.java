@@ -9,6 +9,7 @@ import com.sparta.workflowhelper.global.common.enums.UserRole;
 import com.sparta.workflowhelper.global.common.enums.UserStatus;
 import com.sparta.workflowhelper.global.exception.customexceptions.AlreadyWithdrawnException;
 import com.sparta.workflowhelper.global.exception.customexceptions.InvalidAdminCodeException;
+import com.sparta.workflowhelper.global.exception.customexceptions.TokenInvalidException;
 import com.sparta.workflowhelper.global.exception.customexceptions.UserDuplicateException;
 import com.sparta.workflowhelper.global.exception.errorcodes.AlreadyWithdrawnErrorCode;
 import com.sparta.workflowhelper.global.exception.errorcodes.InvalidAdminCodeErrorCode;
@@ -77,7 +78,7 @@ public class AuthService {
 
         String jwtAccessToken = jwtProvider.createdAccessToken(requestDto.getUsername(), role);
 
-        String jwtRefreshToken = jwtProvider.createdRefreshToken();
+        String jwtRefreshToken = jwtProvider.createdRefreshToken(requestDto.getUsername());
 
         user.updateRefreshToken(jwtRefreshToken);
         authAdapter.save(user);
@@ -122,4 +123,37 @@ public class AuthService {
         SecurityContextHolder.clearContext();
 
     }
+
+    public void tokenReissue(HttpServletRequest request, HttpServletResponse response) {
+
+        String refreshToken = jwtProvider.getJwtFromHeader(request, JwtProvider.REFRESH_HEADER);
+
+        jwtProvider.checkJwtToken(refreshToken);
+
+        String refreshUsername = jwtProvider.getUserNameFromJwtToken(refreshToken);
+
+        User user = authAdapter.findByUsername(refreshUsername);
+
+        String storedRefreshToken = user.getRefreshToken().replace("Bearer ", "");
+        String providedRefreshToken = refreshToken.replace("Bearer ", "");
+
+        if (!storedRefreshToken.equals(providedRefreshToken)) {
+            throw new TokenInvalidException("토큰 정보가 일치하지 않습니다.");
+        }
+
+        issueTokenAndSave(response, user);
+    }
+
+    private void issueTokenAndSave(HttpServletResponse response, User user) {
+        String newAccessToken = jwtProvider.createdAccessToken(user.getUsername(), user.getUserRole());
+        String newRefreshToken = jwtProvider.createdRefreshToken(user.getUsername());
+
+        user.updateRefreshToken(newRefreshToken);
+        // Save user with new refresh token
+        authAdapter.save(user);
+
+        response.setHeader(JwtProvider.ACCESS_HEADER, newAccessToken);
+        response.setHeader(JwtProvider.REFRESH_HEADER, newRefreshToken);
+    }
 }
+
