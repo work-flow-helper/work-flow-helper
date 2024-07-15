@@ -1,15 +1,17 @@
 package com.sparta.workflowhelper.global.exception.handler;
 
 import com.sparta.workflowhelper.global.common.dto.CommonErrorResponseDto;
+import com.sparta.workflowhelper.global.exception.customexceptions.InvalidAdminCodeException;
+import com.sparta.workflowhelper.global.exception.customexceptions.UserDuplicateException;
 import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.NotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,6 +21,20 @@ public class GlobalExceptionHandler {
             NotFoundException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(CommonErrorResponseDto.of(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidAdminCodeException.class)
+    public ResponseEntity<CommonErrorResponseDto<String>> handleInvalidAdminCodeException(
+            InvalidAdminCodeException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(CommonErrorResponseDto.of(HttpStatus.FORBIDDEN.value(), e.getMessage()));
+    }
+
+    @ExceptionHandler(UserDuplicateException.class)
+    public ResponseEntity<CommonErrorResponseDto<String>> handleUserDuplicateException(
+            UserDuplicateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(CommonErrorResponseDto.of(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
     /**

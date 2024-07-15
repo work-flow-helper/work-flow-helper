@@ -8,6 +8,10 @@ import com.sparta.workflowhelper.global.exception.customexceptions.ProjectNotFou
 import com.sparta.workflowhelper.global.exception.customexceptions.StageNotFoundException;
 import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import java.util.List;
+import com.sparta.workflowhelper.domain.stage.entity.Stage;
+import com.sparta.workflowhelper.domain.stage.repository.StageRepository;
+import com.sparta.workflowhelper.global.exception.customexceptions.StageNotFoundException;
+import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
