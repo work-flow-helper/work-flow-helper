@@ -8,18 +8,16 @@ import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.global.exception.customexceptions.CustomAccessDeniedException;
 import com.sparta.workflowhelper.global.exception.customexceptions.ProjectNotFoundException;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class ProjectAdapter {
+
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
@@ -37,10 +35,12 @@ public class ProjectAdapter {
             throw new CustomAccessDeniedException("권한이 없습니다.");  // Exception 변경 리펙토링 내용 **
         } // 로그인한 유저와 요청하는 유저의 프로젝트 정보들이 다를 때
 //Project members에서 해당하는 유저 아이디에 해당하는 프로젝트 아이디를 찾아서 리스트에 추가
-        List<ProjectMember> myProjects = projectMemberRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<ProjectMember> myProjects = projectMemberRepository.findByUserIdOrderByCreatedAtDesc(
+                userId);
         return myProjects
                 .stream()
-                .map(e -> ProjectResponseDto.of(e.getProject().getId(), e.getProject().getTitle(), e.getProject().getInfo()))
+                .map(e -> ProjectResponseDto.of(e.getProject().getId(), e.getProject().getTitle(),
+                        e.getProject().getInfo()))
                 .collect(Collectors.toList()); //stream 처리중에 리스트로 수집하는데 이용
         // 변환 매핑 필터링등의 연산 수행한 결과를 리스트 형태로 반환하고자 할 때 씀
         //  .collect(Collectors.toList());  는 스트림의 요소를 수집하여 새로운 리스트를 생성하는 컬렉터

@@ -14,16 +14,15 @@ import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.domain.user.repository.UserRepository;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+
     private final ProjectMemberRepository projectMemberRepository;
     private final ProjectAdapter projectAdapter;
     private final ProjectRepository projectRepository;
@@ -35,7 +34,8 @@ public class ProjectService {
     // 했지만 이해해야됌
     @Transactional
     public ProjectResponseDto createdProject(ProjectRequestDto projectRequestDto, User user) {
-        Project project = Project.createdProject(projectRequestDto.getTitle(), projectRequestDto.getInfo());
+        Project project = Project.createdProject(projectRequestDto.getTitle(),
+                projectRequestDto.getInfo());
         Project savedProject = projectAdapter.projectSave(project);
         List<ProjectMember> projectMemberList = new ArrayList<>();
         ProjectMember projectMember = ProjectMember.of(user, savedProject);
@@ -76,7 +76,8 @@ public class ProjectService {
         Project findProject = projectAdapter.findById(projectId);
         findProject.changeOf(projectRequestDto.getTitle(), projectRequestDto.getInfo());
         projectRepository.save(findProject);
-        return ProjectResponseDto.of(findProject.getId(), findProject.getTitle(), findProject.getInfo());
+        return ProjectResponseDto.of(findProject.getId(), findProject.getTitle(),
+                findProject.getInfo());
     }
 
     @Transactional
@@ -94,7 +95,8 @@ public class ProjectService {
     }
 
     public void deleteProjectMember(Long projectId, Long memberId) {
-        ProjectMember projectMember = projectMemberRepository.findByProjectIdAndUserId(projectId, memberId)
+        ProjectMember projectMember = projectMemberRepository.findByProjectIdAndUserId(projectId,
+                        memberId)
                 .orElseThrow(() -> new RuntimeException("해당 유저 없음"));// Exception 변경 리펙토링 내용 **
         projectMemberRepository.delete(projectMember);
     }

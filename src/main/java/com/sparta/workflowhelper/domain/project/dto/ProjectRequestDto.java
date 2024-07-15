@@ -2,13 +2,12 @@ package com.sparta.workflowhelper.domain.project.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-
-import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class ProjectRequestDto {
+
     @NotNull
     private String title;
 
