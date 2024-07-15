@@ -3,15 +3,12 @@ package com.sparta.workflowhelper.domain.project.service;
 
 import com.sparta.workflowhelper.domain.mapping.adapter.ProjectMemberAdapter;
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
-import com.sparta.workflowhelper.domain.mapping.repository.ProjectMemberRepository;
 import com.sparta.workflowhelper.domain.project.adapter.ProjectAdapter;
 import com.sparta.workflowhelper.domain.project.dto.ProjectRequestDto;
 import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.project.entity.Project;
-import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
-import com.sparta.workflowhelper.domain.user.repository.UserRepository;
 import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.UserAlreadyExistsException;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
