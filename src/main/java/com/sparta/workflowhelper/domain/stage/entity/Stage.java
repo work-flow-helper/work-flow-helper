@@ -1,7 +1,9 @@
 package com.sparta.workflowhelper.domain.stage.entity;
 
+import com.sparta.workflowhelper.domain.card.entity.Card;
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,7 +12,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,14 +30,38 @@ public class Stage extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Integer position;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    @OneToMany(mappedBy = "stage", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Card> cards = new ArrayList<>();
+
+    // 정적 팩토리 메서드를 사용하도록 하기 위한 private 생성자
+    private Stage(String title, Integer position, Project project) {
+        this.title = title;
+        this.position = position;
+        this.project = project;
+    }
+
+    // 새로운 Stage 인스턴스를 생성하는 정적 팩토리 메서드
+    public static Stage createdStage(String title, Integer position, Project project) {
+        return new Stage(title, position, project);
+    }
+
+    // Stage의 제목을 수정하는 메서드
+    public void updateStage(String title) {
+        this.title = title;
+    }
+
+    // Stage의 위치를 수정하는 메서드
+    public void updatePosition(Integer position) {
+        this.position = position;
+    }
 }

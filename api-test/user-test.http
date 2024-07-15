@@ -1,0 +1,288 @@
+### 값 미리 지정
+
+# 일반 유저 정보 지정
+@username = user1234
+@password = Abcde1234!
+@nickname = nickname
+@email = user1@email.com
+
+# 매니저 유저 정보 지정
+@managerUsername = manager12
+@managerNickname = managername
+@managerEmail = manager1@email.com
+@adminCode = S3cur3Adm!nK3y#456
+
+@cardId = 1
+@userId = 855445
+
+
+### 회원가입 (일반)
+POST http://localhost:8080/api/auth/sign-up
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}",
+  "nickname": "{{nickname}}",
+  "email": "{{email}}"
+}
+
+
+### 회원가입 (매니저)
+POST http://localhost:8080/api/auth/sign-up
+Content-Type: application/json
+
+{
+  "username": "{{managerUsername}}",
+  "password": "{{password}}",
+  "nickname": "{{managerNickname}}",
+  "email": "{{managerEmail}}",
+  "adminCode": "{{adminCode}}"
+}
+
+
+### 일반 유저 로그인 (토큰을 저장해서 다른테스트에 사용가능)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{username}}",
+  "password":"{{password}}"
+}
+
+> {%
+
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+
+%}
+
+
+### 어드민 유저 로그인 (토큰을 저장해서 다른테스트에 사용가능)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username":"{{managerUsername}}",
+  "password":"{{password}}"
+}
+
+> {%
+
+  client.global.set("Authorization", response.headers.valueOf("Authorization"));
+  client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
+
+%}
+
+### 유저 단일 조회
+GET http://localhost:8080/api/users/2
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 유저 전체 조회
+GET http://localhost:8080/api/users
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 유저 정보 수정
+PUT http://localhost:8080/api/users/6
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "nickname": "박명수",
+  "email": "gpark@gmail.com"
+}
+
+### 프로젝트 등록
+POST http://localhost:8080/api/projects
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "프로젝트 이름",
+  "info": "한 줄 설명",
+  "userIdList": [
+    1,
+    2,
+    3,
+    4
+  ]
+}
+
+### 프로젝트 단일 조회
+GET http://localhost:8080/api/projects/{{projectId}}
+Content-Type: application/json
+
+### 내가 속한 프로젝트 조회
+GET http://localhost:8080/api/projects/search?userId=1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 프로젝트 전체 조회
+GET http://localhost:8080/api/projects
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 프로젝트 수정
+PUT http://localhost:8080/api/projects/{{projectId}}
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "수정된 프로젝트 이름",
+  "info": "수정된 한 줄 설명"
+}
+
+### 프로젝트 삭제
+DELETE http://localhost:8080/api/projects/2
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 프로젝트 멤버 등록
+POST http://localhost:8080/api/projects/4/members
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "memberId": 5
+}
+
+### 프로젝트 멤버 삭제
+DELETE http://localhost:8080/api/projects/{{projectId}}/members/2
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 스테이지 등록
+POST http://localhost:8080/api/stages
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "projectId": 1,
+  "title": "스테이지 제목"
+}
+
+
+### 스테이지 전체 조회
+GET http://localhost:8080/api/stages
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 스테이지 수정
+PUT http://localhost:8080/api/stages/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "수정된 스테이지 제목"
+}
+
+### 스테이지 순서 이동
+PATCH http://localhost:8080/api/stages/1/position
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "position": 2
+}
+
+### 스테이지 삭제
+DELETE http://localhost:8080/api/stages/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 카드 생성
+POST http://localhost:8080/api/cards
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "stageId": 1,
+  "title": "테스트",
+  "content": "내용"
+}
+
+### 카드 생성
+POST http://localhost:8080/api/cards
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "stageId": 1,
+  "title": "테스트",
+  "content": "내용",
+  "userIdList": [
+    1,
+    2
+  ]
+}
+
+
+### 단일조회
+GET http://localhost:8080/api/cards/{{cardId}}
+
+
+### 프로젝트내 모든 카드 조회
+GET http://localhost:8080/api/cards?projectId=1
+
+
+### 카드 수정
+PUT http://localhost:8080/api/cards/{{cardId}}
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "title": "테스트",
+  "content": "내용",
+  "userIdList": [
+    1,
+    2
+  ]
+}
+
+
+### 카드 삭제
+DELETE http://localhost:8080/api/cards/9
+Authorization: {{Authorization}}
+
+
+### 카드 순서 이동
+PUT http://localhost:8080/api/cards/{{cardId}}/position
+Authorization: {{Authorization}}
+Content-Type: application/json
+
+{
+  "stageId": 3,
+  "newPosition": 1
+}
+
+### 댓글 생성
+POST http://localhost:8080/api/comments
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "cardId": 1,
+  "content": "댓글내용"
+}
+
+### 댓글 전체 조회
+GET http://localhost:8080/api/comments
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 댓글 수정
+PUT http://localhost:8080/api/comments/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "content": "수정된 댓글내용",
+  "cardId": 1
+}
+
+### 댓글 삭제
+DELETE http://localhost:8080/api/comments/1
+Content-Type: application/json
+Authorization: {{Authorization}}
