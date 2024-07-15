@@ -31,11 +31,6 @@ public class StageAdapter {
         return stageRepository.findByProjectOrderByPositionAsc(project);
     }
 
-    // 스테이지 전체 조회
-    public List<Stage> findAll() {
-        return stageRepository.findAll();
-    }
-
     // 스테이지 ID가 존재하지 않으면 예외를 던짐
     public Stage findStageById(Long stageId) {
         return stageRepository.findById(stageId)
