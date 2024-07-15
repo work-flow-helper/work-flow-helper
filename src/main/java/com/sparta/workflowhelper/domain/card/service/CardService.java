@@ -209,13 +209,13 @@ public class CardService {
 
         Integer oldPosition = moveCard.getPosition();
 
-        if (newPosition > oldPosition) {
+        if (newPosition > oldPosition) { // 카드가 아래로 이동할 경우
             for (Card card : cardList) {
                 if (card.getPosition() > oldPosition && card.getPosition() <= newPosition) {
                     card.updatePositionNumber(card.getPosition() - 1);
                 }
             }
-        } else if (newPosition < oldPosition) {
+        } else if (newPosition < oldPosition) { // 카드가 위로 이동할 경우
             for (Card card : cardList) {
                 if (card.getPosition() >= newPosition && card.getPosition() < oldPosition) {
                     card.updatePositionNumber(card.getPosition() + 1);
