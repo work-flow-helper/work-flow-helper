@@ -25,7 +25,11 @@ public class UserService {
     }
 
     public List<UserInfoResponseDto> getAllProfiles() {
-        return null;
+        List<User> users =userAdapter.findAll();
+
+        return users.stream()
+                .map(user -> UserInfoResponseDto.of(user.getId(), user.getNickname(), user.getEmail()))
+                .collect(Collectors.toList());
     }
 
     public UserInfoResponseDto updateProfile(Long userId, UpdateProfileRequestDto requestDto) {
