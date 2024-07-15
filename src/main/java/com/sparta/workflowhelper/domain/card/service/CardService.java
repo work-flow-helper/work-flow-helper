@@ -252,7 +252,6 @@ public class CardService {
             Worker worker = Worker.createdWorker(workerUser, card);
             worker.addWorkerInCard(card);
             workerList.add(worker);
-
         }
 
         return workerList;
