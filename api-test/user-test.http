@@ -113,7 +113,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "stageId": 3,
+  "stageId": 1,
   "title": "테스트",
   "content": "내용"
 }

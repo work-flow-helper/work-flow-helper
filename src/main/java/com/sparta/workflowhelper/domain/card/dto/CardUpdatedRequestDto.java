@@ -10,6 +10,7 @@ import lombok.Getter;
 public class CardUpdatedRequestDto {
 
     @NotBlank(message = "제목은 필수 입력값 입니다.")
+    @Size(max = 20, message = "카드제목은 20자까지 입력 가능합니다.")
     private String title;
 
     @Size(max = 50000, message = "글자수는 50000자까지 입니다.")
