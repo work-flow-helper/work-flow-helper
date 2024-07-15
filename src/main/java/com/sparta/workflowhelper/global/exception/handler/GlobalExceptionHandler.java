@@ -3,6 +3,7 @@ package com.sparta.workflowhelper.global.exception.handler;
 import com.sparta.workflowhelper.global.common.dto.CommonErrorResponseDto;
 import com.sparta.workflowhelper.global.exception.customexceptions.AlreadyWithdrawnException;
 import com.sparta.workflowhelper.global.exception.customexceptions.InvalidAdminCodeException;
+import com.sparta.workflowhelper.global.exception.customexceptions.ProfileAccessException;
 import com.sparta.workflowhelper.global.exception.customexceptions.UserDuplicateException;
 import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler {
                 .body(CommonErrorResponseDto.of(HttpStatus.CONFLICT.value(), e.getMessage()));
     }
 
+    @ExceptionHandler(ProfileAccessException.class)
+    public ResponseEntity<CommonErrorResponseDto<String>> handleProfileAccessException(
+        ProfileAccessException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(CommonErrorResponseDto.of(HttpStatus.FORBIDDEN.value(), e.getMessage()));
+    }
     /**
      * Controller 에서 @Valid 를 사용했을 때 규칙에 맞지 않았을 경우 발생하는 예외를 처리하는 핸들러
      *

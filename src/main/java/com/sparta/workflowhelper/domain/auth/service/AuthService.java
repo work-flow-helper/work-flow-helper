@@ -4,6 +4,7 @@ import com.sparta.workflowhelper.domain.auth.adapter.AuthAdapter;
 import com.sparta.workflowhelper.domain.auth.dto.AuthRequestDto;
 import com.sparta.workflowhelper.domain.auth.dto.AuthResponseDto;
 import com.sparta.workflowhelper.domain.auth.dto.LoginRequestDto;
+import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.enums.UserRole;
 import com.sparta.workflowhelper.global.common.enums.UserStatus;
@@ -23,12 +24,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final AuthAdapter authAdapter;
+    private final UserAdapter userAdapter;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
@@ -96,14 +99,15 @@ public class AuthService {
 
         String username = jwtProvider.getUserNameFromJwtToken(withdrawToken);
 
-        User user = authAdapter.findByUsername(username);
+        User user = userAdapter.findByUsername(username);
 
-        if (user != null) {
-            user.checkUserWithdrawn();
-            user.updateStatus(UserStatus.WITHDRAWN);
-            authAdapter.save(user);
-            SecurityContextHolder.clearContext();
-        }
+        user.checkUserWithdrawn();
+
+        user.updateStatus(UserStatus.WITHDRAWN);
+
+        authAdapter.save(user);
+        SecurityContextHolder.clearContext();
+
     }
 
     public void logout(HttpServletRequest request) {
@@ -133,22 +137,20 @@ public class AuthService {
         User user = authAdapter.findByUsername(refreshUsername);
 
         String storedRefreshToken = user.getRefreshToken().replace("Bearer ", "");
-        String providedRefreshToken = refreshToken.replace("Bearer ", "");
 
-        if (!storedRefreshToken.equals(providedRefreshToken)) {
+        if (!storedRefreshToken.equals(refreshToken)) {
             throw new TokenInvalidException("토큰 정보가 일치하지 않습니다.");
         }
 
         issueTokenAndSave(response, user);
     }
 
-    private void issueTokenAndSave(HttpServletResponse response, User user) {
+    @Transactional
+    public void issueTokenAndSave(HttpServletResponse response, User user) {
         String newAccessToken = jwtProvider.createdAccessToken(user.getUsername(), user.getUserRole());
         String newRefreshToken = jwtProvider.createdRefreshToken(user.getUsername());
 
         user.updateRefreshToken(newRefreshToken);
-        // Save user with new refresh token
-        authAdapter.save(user);
 
         response.setHeader(JwtProvider.ACCESS_HEADER, newAccessToken);
         response.setHeader(JwtProvider.REFRESH_HEADER, newRefreshToken);

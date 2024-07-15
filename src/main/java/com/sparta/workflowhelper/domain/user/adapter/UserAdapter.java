@@ -5,6 +5,8 @@ import com.sparta.workflowhelper.domain.user.repository.UserRepository;
 import com.sparta.workflowhelper.global.exception.customexceptions.UserNotFoundException;
 import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,7 +33,7 @@ public class UserAdapter {
         return userRepository.save(user);
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 }
