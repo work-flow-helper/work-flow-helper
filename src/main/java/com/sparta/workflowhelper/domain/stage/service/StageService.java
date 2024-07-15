@@ -1,5 +1,6 @@
 package com.sparta.workflowhelper.domain.stage.service;
 
+import com.sparta.workflowhelper.domain.project.adapter.ProjectAdapter;
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.stage.adapter.StageAdapter;
 import com.sparta.workflowhelper.domain.stage.dto.StagePositionRequestDto;
@@ -10,8 +11,6 @@ import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +20,11 @@ public class StageService {
 
     private final StageAdapter stageAdapter;
 
+    private final ProjectAdapter projectAdapter;
+
     @Transactional
     public CommonResponseDto<StageResponseDto> createdStage(StageRequestDto requestDto) {
-        Project project = stageAdapter.findProjectById(requestDto.getProjectId());
+        Project project = projectAdapter.findById(requestDto.getProjectId());
         List<Stage> stageList = stageAdapter.findStagesByProject(project);
 
         int newPosition = calculateNewPosition(stageList);
@@ -39,15 +40,15 @@ public class StageService {
     public CommonResponseDto<List<StageResponseDto>> getAllStages(Long projectId) {
         List<Stage> stages = stageAdapter.findAllByProjectId(projectId);
         List<StageResponseDto> responseDtoList = stages.stream()
-            .map(StageResponseDto::from)
-            .collect(Collectors.toList());
+                .map(StageResponseDto::from)
+                .collect(Collectors.toList());
 
         return new CommonResponseDto<>(200, "스테이지 조회", responseDtoList);
     }
 
     @Transactional
     public CommonResponseDto<StageResponseDto> updateStage(Long stageId,
-        StageRequestDto requestDto) {
+            StageRequestDto requestDto) {
         Stage stage = stageAdapter.findStageById(stageId);
         stage.updateStage(requestDto.getTitle());
         Stage updatedStage = stageAdapter.save(stage);
@@ -65,7 +66,8 @@ public class StageService {
     }
 
     @Transactional
-    public CommonResponseDto<StageResponseDto> moveStage(Long stageId, StagePositionRequestDto requestDto) {
+    public CommonResponseDto<StageResponseDto> moveStage(Long stageId,
+            StagePositionRequestDto requestDto) {
 
         Stage stage = stageAdapter.findStageById(stageId);
         Project project = stage.getProject();
@@ -95,14 +97,16 @@ public class StageService {
         // 포지션 이동
         if (newSequenceNum < currentSequenceNumber) {
             for (Stage stage : stages) {
-                if (stage.getPosition() >= newSequenceNum && stage.getPosition() < currentSequenceNumber) {
+                if (stage.getPosition() >= newSequenceNum
+                        && stage.getPosition() < currentSequenceNumber) {
                     stage.updatePosition(stage.getPosition() + 1);
                     stageAdapter.save(stage);
                 }
             }
         } else {
             for (Stage stage : stages) {
-                if (stage.getPosition() > currentSequenceNumber && stage.getPosition() <= newSequenceNum) {
+                if (stage.getPosition() > currentSequenceNumber
+                        && stage.getPosition() <= newSequenceNum) {
                     stage.updatePosition(stage.getPosition() - 1);
                     stageAdapter.save(stage);
                 }

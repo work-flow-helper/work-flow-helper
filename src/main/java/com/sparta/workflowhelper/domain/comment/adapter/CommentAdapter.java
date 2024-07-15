@@ -1,10 +1,7 @@
 package com.sparta.workflowhelper.domain.comment.adapter;
 
-import com.sparta.workflowhelper.domain.card.entity.Card;
-import com.sparta.workflowhelper.domain.card.repository.CardRepository;
 import com.sparta.workflowhelper.domain.comment.entity.Comment;
 import com.sparta.workflowhelper.domain.comment.repository.CommentRepository;
-import com.sparta.workflowhelper.global.exception.CardNotFoundException;
 import com.sparta.workflowhelper.global.exception.customexceptions.CommentNotFoundException;
 import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import java.util.List;
@@ -23,7 +20,8 @@ public class CommentAdapter {
 
     public Comment findById(Long commentId) {
         return commentRepository.findById(commentId)
-            .orElseThrow(() -> new CommentNotFoundException(NotFoundErrorCode.NOT_FOUND_COMMENT_ENTITY.getMessage()));
+                .orElseThrow(() -> new CommentNotFoundException(
+                        NotFoundErrorCode.NOT_FOUND_COMMENT_ENTITY.getMessage()));
     }
 
     public List<Comment> findAll() {

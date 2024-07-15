@@ -18,11 +18,15 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
     @Transactional
     @Modifying
     @Query("UPDATE Stage s SET s.position = s.position + 1 WHERE s.project = :project AND s.position >= :startPosition AND s.position < :endPosition")
-    void incrementPositions(@Param("project") Project project, @Param("startPosition") int startPosition, @Param("endPosition") int endPosition);
+    void incrementPositions(@Param("project") Project project,
+            @Param("startPosition") int startPosition, @Param("endPosition") int endPosition);
 
     // 지정된 프로젝트 내에서 시작 위치(startPosition)부터 끝 위치(endPosition)까지의 스테이지들의 position 값을 1씩 감소시킴
     @Transactional
     @Modifying
     @Query("UPDATE Stage s SET s.position = s.position - 1 WHERE s.project = :project AND s.position > :startPosition AND s.position <= :endPosition")
-    void decrementPositions(@Param("project") Project project, @Param("startPosition") int startPosition, @Param("endPosition") int endPosition);
+    void decrementPositions(@Param("project") Project project,
+            @Param("startPosition") int startPosition, @Param("endPosition") int endPosition);
+
+    List<Stage> findAllByProjectIdOrderByPositionAsc(Long projectId);
 }
