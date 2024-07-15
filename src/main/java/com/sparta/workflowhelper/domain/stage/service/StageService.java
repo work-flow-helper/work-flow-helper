@@ -7,15 +7,19 @@ import com.sparta.workflowhelper.domain.stage.dto.StageRequestDto;
 import com.sparta.workflowhelper.domain.stage.dto.StageResponseDto;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class StageService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StageService.class);
     private final StageAdapter stageAdapter;
 
     @Transactional
@@ -63,25 +67,60 @@ public class StageService {
 
     @Transactional
     public CommonResponseDto<StageResponseDto> moveStage(Long stageId, StagePositionRequestDto requestDto) {
+        logger.info("moveStage called with stageId: {}, newPosition: {}", stageId, requestDto.getPosition());
+
         Stage stage = stageAdapter.findStageById(stageId);
         Project project = stage.getProject();
         List<Stage> stages = stageAdapter.findStagesByProject(project);
 
         int newPosition = requestDto.getPosition();
+
+        logger.info("Current stages size: {}", stages.size());
+
+        // 새로운 포지션이 유효한지 검사
         if (newPosition < 1 || newPosition > stages.size()) {
+            logger.error("잘못된 위치: {}", newPosition);
             throw new IllegalArgumentException("잘못된 위치입니다.");
         }
 
-        stages.remove(stage);
-        stages.add(newPosition - 1, stage);
-
-        for (int i = 0; i < stages.size(); i++) {
-            stages.get(i).updatePosition(i + 1);
-            stageAdapter.save(stages.get(i));
-        }
+        updateStagePositions(stages, stage, newPosition);
 
         StageResponseDto responseDto = StageResponseDto.from(stage);
+        logger.info("Stage move completed successfully.");
+
         return new CommonResponseDto<>(200, "스테이지 위치 수정", responseDto);
+    }
+
+    private void updateStagePositions(List<Stage> stages, Stage movedStage, int newSequenceNum) {
+        int currentSequenceNumber = movedStage.getPosition();
+
+        if (newSequenceNum == currentSequenceNumber) {
+            return;
+        }
+
+        // 임시 포지션으로 설정(중복 문제 해결)
+        movedStage.updatePosition(0);
+        stageAdapter.save(movedStage);
+
+        // 포지션 이동
+        if (newSequenceNum < currentSequenceNumber) {
+            for (Stage stage : stages) {
+                if (stage.getPosition() >= newSequenceNum && stage.getPosition() < currentSequenceNumber) {
+                    stage.updatePosition(stage.getPosition() + 1);
+                    stageAdapter.save(stage);
+                }
+            }
+        } else {
+            for (Stage stage : stages) {
+                if (stage.getPosition() > currentSequenceNumber && stage.getPosition() <= newSequenceNum) {
+                    stage.updatePosition(stage.getPosition() - 1);
+                    stageAdapter.save(stage);
+                }
+            }
+        }
+
+        movedStage.updatePosition(newSequenceNum);
+        stageAdapter.save(movedStage);
     }
 
     private int calculateNewPosition(List<Stage> stages) {
@@ -92,5 +131,4 @@ public class StageService {
             return lastPosition + 1;
         }
     }
-
 }
