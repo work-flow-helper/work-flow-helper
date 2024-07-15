@@ -5,6 +5,8 @@ import com.sparta.workflowhelper.domain.mapping.repository.ProjectMemberReposito
 import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
 import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
+import com.sparta.workflowhelper.global.exception.customexceptions.CustomAccessDeniedException;
+import com.sparta.workflowhelper.global.exception.customexceptions.ProjectNotFoundException;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,12 +29,12 @@ public class ProjectAdapter {
 
     public Project findById(Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(() ->
-                new RuntimeException("해당 프로젝트가 없습니다."));
-    } // Exception 변경 리펙토링 내용 **
+                new ProjectNotFoundException("해당 프로젝트가 없습니다."));
+    }
 
     public List<ProjectResponseDto> findMyProjects(Long userId, UserDetailsImpl userDetails) {
         if (!userId.equals(userDetails.getUser().getId())) {
-            throw new RuntimeException("권한이 없습니다.");  // Exception 변경 리펙토링 내용 **
+            throw new CustomAccessDeniedException("권한이 없습니다.");  // Exception 변경 리펙토링 내용 **
         } // 로그인한 유저와 요청하는 유저의 프로젝트 정보들이 다를 때
 //Project members에서 해당하는 유저 아이디에 해당하는 프로젝트 아이디를 찾아서 리스트에 추가
         List<ProjectMember> myProjects = projectMemberRepository.findByUserIdOrderByCreatedAtDesc(userId);
@@ -56,7 +58,7 @@ public class ProjectAdapter {
         try {
             projectRepository.deleteById(projectId);
         } catch (EmptyResultDataAccessException e) {   // Exception 변경 리펙토링 내용 **
-            throw new RuntimeException("해당 프로젝트가 없습니다." + projectId, e);
+            throw new ProjectNotFoundException("해당 프로젝트가 없습니다." + projectId);
         }
     }
 
