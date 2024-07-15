@@ -259,8 +259,12 @@ public class CardService {
     private Integer createdPositionNumber(Stage stage) {
 
         Integer lastCardPosition = cardQueryRepository.findLastPositionInStage(stage.getId());
-
-        return lastCardPosition + 1;
+        
+        if (lastCardPosition == null) {
+            return 1;
+        } else {
+            return lastCardPosition + 1;
+        }
     }
 
     /**

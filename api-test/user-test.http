@@ -13,6 +13,7 @@
 @adminCode = S3cur3Adm!nK3y#456
 
 @cardId = 1
+@userId = 855445
 
 
 ### 회원가입 (일반)
