@@ -78,7 +78,8 @@ public class CardService {
 
         Set<Long> inputUserIdSet = new HashSet<>(requestDto.getUserIdList());
 
-        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
+        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card,
+                projectMemberUserIdSet);
 
         workerList.forEach(worker -> workerInfoDtoList.add(
                 WorkerInfoDto.of(worker.getUser().getId(), worker.getUser().getNickname())
@@ -130,7 +131,7 @@ public class CardService {
     public CardDetailResponseDto<WorkerInfoDto> updatedCard(Long cardId,
             CardUpdatedRequestDto requestDto, User user) {
 
-        checkUserIsProjectMembers(cardId, user);
+        Set<Long> projectMemberUserIdSet = checkUserIsProjectMembers(cardId, user);
 
         Card card = cardAdapter.findById(cardId);
 
@@ -148,7 +149,8 @@ public class CardService {
 
         inputUserIdSet.removeAll(WorkerUserIdSet);
 
-        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card);
+        List<Worker> workerList = createdAndSaveWorkerAndGetDtoList(inputUserIdSet, card,
+                projectMemberUserIdSet);
 
         workerSet.addAll(workerList);
 
@@ -237,15 +239,20 @@ public class CardService {
      * @return 작업자 엔티티
      */
     private List<Worker> createdAndSaveWorkerAndGetDtoList(Set<Long> inputUserIdSet,
-            Card card) {
+            Card card, Set<Long> projectMemberUserIdSet) {
 
         List<Worker> workerList = new ArrayList<>();
 
         for (Long inputUserId : inputUserIdSet) {
+            if (!projectMemberUserIdSet.contains(inputUserId)) {
+                throw new ProjectMemberNotFoundException(
+                        NotFoundErrorCode.NOT_FOUND_PROJECT_MEMBER_ENTITY.getMessage());
+            }
             User workerUser = userAdapter.findById(inputUserId);
             Worker worker = Worker.createdWorker(workerUser, card);
             worker.addWorkerInCard(card);
             workerList.add(worker);
+
         }
 
         return workerList;
@@ -260,7 +267,11 @@ public class CardService {
 
         Integer lastCardPosition = cardQueryRepository.findLastPositionInStage(stage.getId());
 
-        return lastCardPosition + 1;
+        if (lastCardPosition == null) {
+            return 1;
+        } else {
+            return lastCardPosition + 1;
+        }
     }
 
     /**
@@ -269,7 +280,7 @@ public class CardService {
      * @param cardId 접근하려고 하는 카드의 고유번호
      * @param user   로그인한 유저
      */
-    private void checkUserIsProjectMembers(Long cardId, User user) {
+    private Set<Long> checkUserIsProjectMembers(Long cardId, User user) {
 
         List<ProjectMemberIdDto> projectMemberUserIdList =
                 cardQueryRepository.findProjectMemberIdListByCardId(cardId);
@@ -277,6 +288,8 @@ public class CardService {
         Set<Long> projectMemberUserIdSet = convertToProjectMemberUserIdSet(projectMemberUserIdList);
 
         checkUserIsProjectMembers(projectMemberUserIdSet, user.getId());
+
+        return projectMemberUserIdSet;
     }
 
     /**
