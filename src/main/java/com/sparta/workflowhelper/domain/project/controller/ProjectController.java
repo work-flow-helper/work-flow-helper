@@ -90,20 +90,20 @@ public class ProjectController {
     }
 
     //Delete Project
-    @DeleteMapping("/api/projects/{projectId}")
-    public ResponseEntity<CommonResponseDto<String>> deleteProject(@PathVariable Long projectId) {
-
+    @DeleteMapping("/projects/{projectId}")
+    public ResponseEntity<CommonResponseDto<String>> deleteProject(
+            @PathVariable Long projectId) {
+        projectService.deleteProject(projectId);
         return ResponseEntity
                 .status(204)
                 .body(CommonResponseDto.of(
                         204,
-                        "프로젝트 삭제",
-                        projectService.deleteProject(projectId)
+                        "프로젝트 삭제", null
                 ));
     }
 
     //Post add Participate User in Project
-    @PostMapping("/api/projects/{projectId}/members")
+    @PostMapping("/projects/{projectId}/members")
     public ResponseEntity<CommonResponseDto<ProjectResponseDto>> addProjectMember(
             @PathVariable Long projectId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -118,7 +118,7 @@ public class ProjectController {
     }
 
     //Delete Removing Participating User in Project
-    @DeleteMapping("/api/projects/{projectId}/members/{memberId}")
+    @DeleteMapping("/projects/{projectId}/members/{memberId}")
     public ResponseEntity<CommonResponseDto<Null>> addProjectMember(
             @PathVariable Long projectId,
             @PathVariable Long memberId) {

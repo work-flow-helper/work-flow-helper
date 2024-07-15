@@ -21,8 +21,8 @@ public class ProjectAdapter {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
-    public void projectSave(Project project) {
-        projectRepository.save(project);
+    public Project projectSave(Project project) {
+        return projectRepository.save(project);
     }
 
     public Project findById(Long projectId) {
@@ -30,7 +30,7 @@ public class ProjectAdapter {
                 new RuntimeException("해당 프로젝트가 없습니다."));
     } // Exception 변경 리펙토링 내용 **
 
-    public List<ProjectResponseDto> findMyprojects(Long userId, UserDetailsImpl userDetails) {
+    public List<ProjectResponseDto> findMyProjects(Long userId, UserDetailsImpl userDetails) {
         if (!userId.equals(userDetails.getUser().getId())) {
             throw new RuntimeException("권한이 없습니다.");  // Exception 변경 리펙토링 내용 **
         } // 로그인한 유저와 요청하는 유저의 프로젝트 정보들이 다를 때

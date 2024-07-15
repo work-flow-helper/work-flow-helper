@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -16,4 +17,5 @@ public class ProjectRequestDto {
 
     private List<Long> userIdList;
     //리퀘스트에서 유저정보를 받음(id) 리스트로
+
 }
