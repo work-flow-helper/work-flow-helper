@@ -14,8 +14,11 @@ import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.domain.user.repository.UserRepository;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,18 +44,17 @@ public class ProjectService {
         ProjectMember projectMember = ProjectMember.of(user, savedProject);
         projectMemberList.add(projectMember);
 
-        if (projectRequestDto.getUserIdList() == null) {
-            User participatingUser = userAdapter.findById(user.getId());
-            ProjectMember saveProjectMember = ProjectMember.of(participatingUser, project);
-            projectMemberList.add(saveProjectMember);
-        } else {
+        if (projectRequestDto.getUserIdList() != null) {
             for (Long userId : projectRequestDto.getUserIdList()) { // 팀을 만들때 추가해서 넣어주는 아이디들
+                if (Objects.equals(userId, user.getId())) {
+                    continue;
+                }
                 User participatingUser = userAdapter.findById(userId);
                 ProjectMember saveProjectMember = ProjectMember.of(participatingUser, project);
                 projectMemberList.add(saveProjectMember);
             }
-            projectMemberAdapter.saveAll(projectMemberList);
         }
+        projectMemberAdapter.saveAll(projectMemberList);
         // if 구문으로 널값이 오면 useridlist에 본인 id값만 넣어주고 널값이아니면 포문을 돌
         return ProjectResponseDto.of(project.getId(), project.getTitle(), project.getInfo());
     }

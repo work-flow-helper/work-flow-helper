@@ -16,8 +16,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,7 +63,7 @@ public class User extends TimeStamped {
 
     @Builder(access = AccessLevel.PRIVATE)
     private User(String username, String password, String nickname, String email, UserStatus userStatus,
-            UserRole userRole) {
+                 UserRole userRole) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
@@ -71,7 +73,7 @@ public class User extends TimeStamped {
     }
 
     public static User createdUser(String username, String password, String nickname, String email, UserStatus userStatus,
-            UserRole userRole) {
+                                   UserRole userRole) {
         return User.builder()
                 .username(username)
                 .password(password)
