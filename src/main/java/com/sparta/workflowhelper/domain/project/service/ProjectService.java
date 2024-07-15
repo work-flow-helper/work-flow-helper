@@ -25,8 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
-
-    private final ProjectMemberRepository projectMemberRepository;
+    
     private final ProjectAdapter projectAdapter;
     private final ProjectMemberAdapter projectMemberAdapter;
     private final UserAdapter userAdapter;
