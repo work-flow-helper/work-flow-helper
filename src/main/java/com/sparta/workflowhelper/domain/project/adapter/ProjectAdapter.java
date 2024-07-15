@@ -8,8 +8,10 @@ import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.global.exception.customexceptions.CustomAccessDeniedException;
 import com.sparta.workflowhelper.global.exception.customexceptions.ProjectNotFoundException;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
@@ -62,4 +64,7 @@ public class ProjectAdapter {
         }
     }
 
+    public Project save(Project project) {
+        return projectRepository.save(project);
+    }
 }
