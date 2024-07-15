@@ -27,6 +27,12 @@ public class UserAdapter {
                         NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
     }
 
+    public User findByNickName(String NickName) {
+        return userRepository.findByNickname(NickName)
+                .orElseThrow(() -> new UserNotFoundException(
+                        NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
+    }
+
     public User save(User user) {
         return userRepository.save(user);
     }

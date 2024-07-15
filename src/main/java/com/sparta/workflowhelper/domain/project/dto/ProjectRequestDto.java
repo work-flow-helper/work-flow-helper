@@ -2,7 +2,9 @@ package com.sparta.workflowhelper.domain.project.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import java.util.List;
+
 import lombok.Getter;
 
 @Getter
@@ -16,5 +18,4 @@ public class ProjectRequestDto {
 
     private List<Long> userIdList;
     //리퀘스트에서 유저정보를 받음(id) 리스트로
-
 }
