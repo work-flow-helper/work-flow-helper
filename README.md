@@ -10,7 +10,11 @@
 
 # ⚙개발환경
 
-![image](https://github.com/user-attachments/assets/1f7d0ed8-3dc9-44db-ad2d-46f10fe37393)
+* JDK & Java : 17
+* Build Tool : Gradle
+* Spring Boot Version : 3.3.1
+* MySQL : 8.0.37
+* Dependencies : jpa, lombok, mysql, QueryDSL, Spring Security, Validation, JWT
 
  <br/>
  
@@ -37,4 +41,4 @@
  
 # 📜API
 
-![image](https://github.com/user-attachments/assets/b03c78ab-44d8-4cf7-a585-79a0be9f9627)
+![image](https://github.com/user-attachments/assets/472ccb98-b043-4034-828a-0ef7fc380023)
