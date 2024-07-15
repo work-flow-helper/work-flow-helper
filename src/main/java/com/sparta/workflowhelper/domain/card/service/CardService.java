@@ -205,17 +205,16 @@ public class CardService {
 
         List<Card> cardList = cardQueryRepository.findAllCardByStageId(stage.getId());
 
+        Integer oldPosition = moveCard.getPosition();
         Integer newPosition = requestDto.getNewPosition();
 
-        Integer oldPosition = moveCard.getPosition();
-
-        if (newPosition > oldPosition) {
+        if (newPosition > oldPosition) { // 카드가 아래로 이동할 경우
             for (Card card : cardList) {
                 if (card.getPosition() > oldPosition && card.getPosition() <= newPosition) {
                     card.updatePositionNumber(card.getPosition() - 1);
                 }
             }
-        } else if (newPosition < oldPosition) {
+        } else if (newPosition < oldPosition) { // 카드가 위로 이동할 경우
             for (Card card : cardList) {
                 if (card.getPosition() >= newPosition && card.getPosition() < oldPosition) {
                     card.updatePositionNumber(card.getPosition() + 1);
@@ -243,13 +242,9 @@ public class CardService {
         List<Worker> workerList = new ArrayList<>();
 
         for (Long inputUserId : inputUserIdSet) {
-
             User workerUser = userAdapter.findById(inputUserId);
-
             Worker worker = Worker.createdWorker(workerUser, card);
-
             worker.addWorkerInCard(card);
-
             workerList.add(worker);
         }
 
