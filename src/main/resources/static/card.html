@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Workflow Helper - 메인</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.css"
+        rel="stylesheet"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header {
+      background-color: #fff;
+      color: #333;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .project-info {
+      margin-left: 20px;
+      margin-top: 4px;
+    }
+
+    .project-info h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .project-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .profile .fa-user {
+      font-size: 3em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .profile button {
+      background-color: #000;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 20px;
+      width: 100px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .profile button:hover {
+      background-color: #333;
+    }
+
+    .board {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      background-color: #fff;
+      overflow-x: auto;
+    }
+
+    .board-column {
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-right: 20px;
+      flex: 0 0 300px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .board-column:last-child {
+      margin-right: 0;
+    }
+
+    .board-column-header {
+      background-color: #f00;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      cursor: grab;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .board-column-header button {
+      background-color: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .board-column-content {
+      padding: 10px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .board-item {
+      background-color: #eee;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .board-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .add-item {
+      background-color: #fff;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: auto;
+    }
+
+    .add-item:hover {
+      background-color: #f0f0f0;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background-color: #fff;
+      width: 800px;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-footer {
+      text-align: right;
+    }
+
+    .modal.show {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .team-list {
+      margin-top: 10px;
+    }
+
+    .team-list-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-results {
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+
+    .search-result-item {
+      padding: 5px 0;
+      cursor: pointer;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-result-item:hover {
+      background-color: #f0f0f0;
+    }
+
+    .comment-box {
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+
+    .comment {
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .comment-actions {
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>Workflow Helper</h1>
+    <br/>
+    <br/>
+    <div class="project-info">
+      <h2>프로젝트 이름</h2>
+      <br/>
+      <p>간단한 한 줄 소개</p>
+    </div>
+  </div>
+  <div class="profile">
+    <i class="fas fa-user fa-3x"></i>
+    <!-- 아이콘 크기 조정 -->
+    <button onclick="logout()">로그아웃</button>
+    <button onclick="deleteAccount()">회원탈퇴</button>
+    <button id="addMemberBtn">팀원추가</button>
+  </div>
+</div>
+<div class="board" id="board">
+  <div class="board-column" id="column-todo">
+    <div class="board-column-header">
+      할 일
+      <button onclick="deleteColumn('column-todo')">삭제</button>
+    </div>
+    <div class="board-column-content">
+      <div class="board-item" onclick="openCardDetailModal('할 일 항목 1', '할 일', '내용 예시')">
+        할 일 항목 1
+      </div>
+      <div class="board-item" onclick="openCardDetailModal('할 일 항목 2', '할 일', '내용 예시')">
+        할 일 항목
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
