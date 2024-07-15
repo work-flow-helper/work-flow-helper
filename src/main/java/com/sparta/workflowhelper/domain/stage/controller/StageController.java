@@ -9,6 +9,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
+@Validated
 @RequestMapping("/api/stages")
 public class StageController {
 
     private final StageService stageService;
 
-    // 스테이지 생성
+    // 스테이지 생성(매니저만)
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public ResponseEntity<CommonResponseDto<StageResponseDto>> createdStage(@RequestBody StageRequestDto requestDto) {
         CommonResponseDto<StageResponseDto> responseDto = stageService.createdStage(requestDto);
@@ -33,14 +37,16 @@ public class StageController {
     }
 
     // 스테이지 조회
-    @GetMapping
-    public ResponseEntity<CommonResponseDto<List<StageResponseDto>>> getAllStages() {
-        CommonResponseDto<List<StageResponseDto>> responseDto = stageService.getAllStages();
+    @GetMapping("/projects/{projectId}")
+    public ResponseEntity<CommonResponseDto<List<StageResponseDto>>> getAllStages(
+        @PathVariable Long projectId) {
+        CommonResponseDto<List<StageResponseDto>> responseDto = stageService.getAllStages(projectId);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
 
-    // 스테이지 수정
+    // 스테이지 수정(매니저만)
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/{stageId}")
     public ResponseEntity<CommonResponseDto<StageResponseDto>> updateStage(
         @PathVariable Long stageId,
@@ -49,7 +55,8 @@ public class StageController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
-    // 스테이지 삭제
+    // 스테이지 삭제(매니저만)
+    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{stageId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteStage(@PathVariable Long stageId) {
         CommonResponseDto<Void> responseDto = stageService.deleteStage(stageId);
@@ -57,6 +64,7 @@ public class StageController {
     }
 
     // 스테이지 순서 이동
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/{stageId}/position")
     public ResponseEntity<CommonResponseDto<StageResponseDto>> moveStage(
         @PathVariable Long stageId,

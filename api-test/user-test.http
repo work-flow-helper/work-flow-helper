@@ -76,12 +76,11 @@ Authorization: {{Authorization}}
 
 {
   "projectId": 1,
-  "title": "스테이지 제목"
+  "title": "스테이지 제목zzzzzzzz"
 }
 
-
 ### 스테이지 전체 조회
-GET http://localhost:8080/api/stages
+GET http://localhost:8080/api/stages/projects/1
 Content-Type: application/json
 Authorization: {{Authorization}}
 

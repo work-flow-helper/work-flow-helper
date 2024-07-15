@@ -21,14 +21,6 @@ public class StageAdapter {
 
     private final StageRepository stageRepository;
 
-    private final ProjectRepository projectRepository;
-
-    // 프로젝트 ID가 존재하지 않으면 예외를 던짐
-    public Project findProjectById(Long projectId) {
-        return projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(NotFoundErrorCode.NOT_FOUND_PROJECT_ENTITY.getMessage()));
-    }
-
     // Stage 엔티티를 데이터베이스에 저장
     public Stage save(Stage stage) {
         return stageRepository.save(stage);
