@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Workflow Helper - 메인</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.css"
+        rel="stylesheet"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .header {
+      background-color: #fff;
+      color: #333;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .project-info {
+      margin-left: 20px;
+      margin-top: 4px;
+    }
+
+    .project-info h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .project-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #777;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .profile .fa-user {
+      font-size: 3em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .profile button {
+      background-color: #000;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 20px;
+      width: 100px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .profile button:hover {
+      background-color: #333;
+    }
+
+    .board {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      background-color: #fff;
+    }
+
+    .board-column {
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-right: 20px;
+      flex: 0 0 300px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .board-column:last-child {
+      margin-right: 0;
+    }
+
+    .board-column-header {
+      background-color: #f00;
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      cursor: grab;
+    }
+
+    .board-column-content {
+      padding: 10px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .board-item {
+      background-color: #eee;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .board-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .add-item {
+      background-color: #fff;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      margin-top: auto;
+    }
+
+    .add-item:hover {
+      background-color: #f0f0f0;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background-color: #fff;
+      width: 400px;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      text-align: right;
+    }
+
+    .modal.show {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .team-list {
+      margin-top: 10px;
+    }
+
+    .team-list-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-results {
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+
+    .search-result-item {
+      padding: 5px 0;
+      cursor: pointer;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .search-result-item:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>Workflow Helper</h1>
+    <br/>
+    <br/>
+    <div class="project-info">
+      <h2>프로젝트 이름</h2>
+      <br/>
+      <p>간단한 한 줄 소개</p>
+    </div>
+  </div>
+  <div class="profile">
+    <i class="fas fa-user fa-3x"></i>
+    <!-- 아이콘 크기 조정 -->
+    <button onclick="logout()">로그아웃</button>
+    <button onclick="deleteAccount()">회원탈퇴</button>
+    <button id="addMemberBtn">팀원추가</button>
+  </div>
+</div>
+<div class="board" id="board">
+  <div class="board-column" id="column-todo">
+    <div class="board-column-header">할 일</div>
+    <div class="board-column-content">
+      <div class="board-item" onclick="openCardDetailModal('할 일 항목 1')">할 일 항목 1</div>
+      <div class="board-item" onclick="openCardDetailModal('할 일 항목 2')">할 일 항목 2</div>
+      <div class="board-item" onclick="openCardDetailModal('할 일 항목 3')">할 일 항목 3</div>
+    </div>
+    <div class="add-item non-draggable" onclick="openAddItemModal('column-todo')">+ 항목 추가</div>
+  </div>
+  <div class="board-column" id="column-inprogress">
+    <div class="board-column-header">진행 중</div>
+    <div class="board-column-content">
+      <div class="board-item" onclick="openCardDetailModal('진행 중 항목 1')">진행 중 항목 1</div>
+      <div class="board-item" onclick="openCardDetailModal('진행 중 항목 2')">진행 중 항목 2</div>
+    </div>
+    <div class="add-item non-draggable" onclick="openAddItemModal('column-inprogress')">+ 항목 추가
+    </div>
+  </div>
+  <div class="board-column" id="column-review">
+    <div class="board-column-header">검토 중</div>
+    <div class="board-column-content">
+      <div class="board-item" onclick="openCardDetailModal('검토 중 항목 1')">검토 중 항목 1</div>
+    </div>
+    <div class="add-item non-draggable" onclick="openAddItemModal('column-review')">+ 항목 추가</div>
+  </div>
+  <div class="board-column" id="column-done">
+    <div class="board-column-header">완료</div>
+    <div class="board-column-content">
+      <div class="board-item" onclick="openCardDetailModal('완료 항목 1')">완료 항목 1</div>
+    </div>
+    <div class="add-item non-draggable" onclick="openAddItemModal('column-done')">+ 항목 추가</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">팀원 추가</div>
+    <div class="modal-body">
+      <label for="memberSearch">이름 또는 이메일 검색:</label>
+      <input id="memberSearch" name="memberSearch" type="text"/><br/><br/>
+      <button onclick="searchMember()">검색</button>
+      <div class="search-results" id="searchResults"></div>
+      <div class="team-list" id="teamList">
+        <div class="team-list-item">현재 팀원 목록</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="closeModalBtn">취소</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addItemModal">
+  <div class="modal">
+    <div class="modal-header">항목 추가</div>
+    <div class="modal-body">
+      <label for="title">제목 (필수):</label>
+      <input id="title" name="title" type="text"/><br/><br/>
+      <label for="worker">담당자 (선택):</label>
+      <input id="workerSearch" name="worker" oninput="searchWorker()" type="text"/><br/><br/>
+      <div class="search-results" id="workerResults"></div>
+      <label for="deadlineDate">마감기한 날짜 (선택):</label>
+      <input id="deadlineDate" name="deadlineDate" type="date"/><br/><br/>
+      <label for="deadlineTime">마감기한 시간 (선택):</label>
+      <input id="deadlineTime" name="deadlineTime" type="time"/><br/><br/>
+      <label for="content">내용 (선택):</label>
+      <textarea id="content" name="content"></textarea><br/><br/>
+    </div>
+    <div class="modal-footer">
+      <button onclick="addItem()">카드 추가</button>
+      <button onclick="closeAddItemModal()">취소</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+<script>
+  let teamMembers = [];
+  let currentColumnId = null;
+  const mockDatabase = [
+    {name: 'John Doe', email: 'john@example.com'},
+    {name: 'Jane Smith', email: 'jane@example.com'},
+    {name: 'Bob Johnson', email: 'bob@example.com'},
+  ];
+
+  function logout() {
+    alert('로그아웃 완료.');
+    window.location.href = 'index.html';
+    // 여기에 로그아웃 기능 구현
+  }
+
+  function deleteAccount() {
+    alert('회원탈퇴 완료.');
+    // 회원탈퇴 할거냐고 물어보는 로직을 넣어야함
+  }
+
+  function addMember() {
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.style.display = 'flex';
+    renderTeamList();
+  }
+
+  function closeModal() {
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.style.display = 'none';
+  }
+
+  function searchMember() {
+    const searchValue = document.getElementById('memberSearch').value.toLowerCase();
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '';
+
+    if (searchValue) {
+      const results = mockDatabase.filter(
+          (member) =>
+              member.name.toLowerCase().includes(searchValue) ||
+              member.email.toLowerCase().includes(searchValue)
+      );
+
+      results.forEach((result) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        resultItem.textContent = `${result.name} (${result.email})`;
+        resultItem.addEventListener('click', () => selectMember(result));
+        searchResults.appendChild(resultItem);
+      });
+    } else {
+      alert('검색어를 입력해주세요.');
+    }
+  }
+
+  function selectMember(member) {
+    if (!teamMembers.find((m) => m.email === member.email)) {
+      teamMembers.push(member);
+      renderTeamList();
+      alert(`팀원 ${member.name} 추가 완료!`);
+    } else {
+      alert('이미 추가된 팀원입니다.');
+    }
+    closeModal();
+  }
+
+  function renderTeamList() {
+    const teamList = document.getElementById('teamList');
+    teamList.innerHTML = '<div class="team-list-item">현재 팀원 목록</div>';
+    teamMembers.forEach((member) => {
+      const memberItem = document.createElement('div');
+      memberItem.className = 'team-list-item';
+      memberItem.textContent = `${member.name} (${member.email})`;
+      teamList.appendChild(memberItem);
+    });
+  }
+
+  function openAddItemModal(columnId) {
+    currentColumnId = columnId;
+    const addItemModal = document.getElementById('addItemModal');
+    addItemModal.style.display = 'flex';
+  }
+
+  function closeAddItemModal() {
+    const addItemModal = document.getElementById('addItemModal');
+    addItemModal.style.display = 'none';
+  }
+
+  function searchWorker() {
+    const searchValue = document.getElementById('workerSearch').value.toLowerCase();
+    const workerResults = document.getElementById('workerResults');
+    workerResults.innerHTML = '';
+
+    if (searchValue) {
+      const results = teamMembers.filter(
+          (member) =>
+              member.name.toLowerCase().includes(searchValue) ||
+              member.email.toLowerCase().includes(searchValue)
+      );
+
+      results.forEach((result) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'search-result-item';
+        resultItem.textContent = `${result.name} (${result.email})`;
+        resultItem.addEventListener('click', () => selectWorker(result));
+        workerResults.appendChild(resultItem);
+      });
+    }
+  }
+
+  function selectWorker(worker) {
+    const workerInput = document.getElementById('workerSearch');
+    workerInput.value = worker.name;
+    document.getElementById('workerResults').innerHTML = '';
+  }
+
+  function addItem() {
+    const title = document.getElementById('title').value;
+    const worker = document.getElementById('workerSearch').value;
+    const deadlineDate = document.getElementById('deadlineDate').value;
+    const deadlineTime = document.getElementById('deadlineTime').value;
+    const content = document.getElementById('content').value;
+
+    if (!title) {
+      alert('제목은 필수 항목입니다.');
+      return;
+    }
+
+    const deadline = deadlineDate && deadlineTime ? `${deadlineDate} ${deadlineTime}` : deadlineDate
+        || '';
+
+    const newItem = {
+      title,
+      worker,
+      deadline,
+      content,
+    };
+
+    const column = document
+    .getElementById(currentColumnId)
+    .getElementsByClassName('board-column-content')[0];
+    const newCard = document.createElement('div');
+    newCard.className = 'board-item';
+    newCard.setAttribute('onclick', `openCardDetailModal('${newItem.title}')`);
+    newCard.innerHTML = `
+                    <div><strong>${newItem.title}</strong></div>
+                    <div>${newItem.worker}</div>
+                    <div>${newItem.deadline}</div>
+                `;
+    column.insertBefore(newCard, column.querySelector('.add-item'));
+
+    // 여기에 백엔드로 데이터를 전송하는 코드 추가
+    // fetch('/addItem', { method: 'POST', body: JSON.stringify(newItem) })
+
+    console.log('새 항목 추가:', newItem);
+    closeAddItemModal();
+  }
+
+  function openCardDetailModal(title) {
+    alert(`카드 세부 정보: ${title}`);
+    // 여기에 카드 세부 정보 페이지로 이동하는 코드를 추가하세요.
+  }
+
+  document.getElementById('addMemberBtn').addEventListener('click', addMember);
+  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+
+  // SortableJS를 사용하여 드래그 앤 드롭 기능 구현
+  const board = document.getElementById('board');
+  const columns = board.getElementsByClassName('board-column');
+
+  for (const column of columns) {
+    new Sortable(column.getElementsByClassName('board-column-content')[0], {
+      group: 'shared', // 모든 컬럼이 같은 그룹에 속하도록 설정
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      handle: '.board-item',
+      scroll: false,
+      onEnd: function (evt) {
+        const addItem = evt.from.querySelector('.add-item');
+        const items = Array.from(evt.from.children);
+        const addItemIndex = items.indexOf(addItem);
+        if (evt.newIndex > addItemIndex) {
+          evt.from.insertBefore(evt.item, addItem);
+        }
+        console.log('Card moved:', evt.item);
+      },
+    });
+  }
+
+  new Sortable(board, {
+    animation: 150,
+    handle: '.board-column-header',
+    ghostClass: 'sortable-ghost',
+    scroll: false,
+    onEnd: function (evt) {
+      console.log('Column moved:', evt);
+    },
+  });
+</script>
+</body>
+</html>
