@@ -1,5 +1,6 @@
 package com.sparta.workflowhelper.domain.card.entity;
 
+import com.sparta.workflowhelper.domain.project.entity.Project;
 import com.sparta.workflowhelper.domain.stage.entity.Stage;
 import com.sparta.workflowhelper.domain.worker.entity.Worker;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
@@ -87,5 +88,9 @@ public class Card extends TimeStamped {
     public void updatePosition(Integer newPosition, Stage stage) {
         this.position = newPosition;
         this.stage = stage;
+    }
+
+    public Project getProject() {
+        return this.stage.getProject();
     }
 }

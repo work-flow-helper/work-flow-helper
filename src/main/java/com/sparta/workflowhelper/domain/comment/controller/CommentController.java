@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/comments")
 public class CommentController {
 
@@ -45,15 +45,15 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<CommonResponseDto<CommentResponseDto>> updateComment(
         @PathVariable Long commentId,
-        @RequestBody CommentRequestDto requestDto) {
-        CommonResponseDto<CommentResponseDto> responseDto = commentService.updateComment(commentId, requestDto);
+        @RequestBody CommentRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CommonResponseDto<CommentResponseDto> responseDto = commentService.updateComment(commentId, requestDto, userDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // 댓글 삭제
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<CommonResponseDto<Void>> deleteComment(@PathVariable Long commentId) {
-        CommonResponseDto<Void> responseDto = commentService.deleteComment(commentId);
+    public ResponseEntity<CommonResponseDto<Void>> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CommonResponseDto<Void> responseDto = commentService.deleteComment(commentId, userDetails.getUser());
         return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
     }
 }
