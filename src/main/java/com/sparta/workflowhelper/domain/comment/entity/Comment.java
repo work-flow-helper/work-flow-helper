@@ -26,7 +26,7 @@ public class Comment extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,4 +37,20 @@ public class Comment extends TimeStamped {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
+    // 정적 팩토리 메서드를 사용하도록 하기 위한 private 생성자
+    private Comment(String content, User user, Card card) {
+        this.content = content;
+        this.user = user;
+        this.card = card;
+    }
+
+    // 새로운 Comment 인스턴스를 생성하는 정적 팩토리 메서드
+    public static Comment create(String content, User user, Card card) {
+        return new Comment(content, user, card);
+    }
+
+    // 댓글의 content를 수정하는 정적 팩토리 메서드
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
