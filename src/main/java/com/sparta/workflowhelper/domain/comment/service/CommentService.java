@@ -6,12 +6,11 @@ import com.sparta.workflowhelper.domain.comment.adapter.CommentAdapter;
 import com.sparta.workflowhelper.domain.comment.dto.CommentRequestDto;
 import com.sparta.workflowhelper.domain.comment.dto.CommentResponseDto;
 import com.sparta.workflowhelper.domain.comment.entity.Comment;
-import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
+import com.sparta.workflowhelper.domain.mapping.dto.ProjectMemberIdDto;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +22,16 @@ public class CommentService {
 
     private UserAdapter userAdapter;
 
-    private CardAdapter cardAdapter;
+    private final CardAdapter cardAdapter;
 
+    private final CardQueryRepository cardQueryRepository;
+
+    // - 완료
     @Transactional
     public CommonResponseDto<CommentResponseDto> createdComment(CommentRequestDto requestDto, Long userId) {
         User user = userAdapter.findById(userId);
         Card card = cardAdapter.findById(requestDto.getCardId());
+
         Comment comment = Comment.create(requestDto.getContent(), user, card);
         Comment savedComment = commentAdapter.save(comment);
 
@@ -36,6 +39,7 @@ public class CommentService {
         return CommonResponseDto.of(201, "댓글 등록", responseDto);
     }
 
+    //  - 완료
     @Transactional(readOnly = true)
     public CommonResponseDto<List<CommentResponseDto>> getComment() {
         List<Comment> comments = commentAdapter.findAll();
