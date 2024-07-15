@@ -92,10 +92,6 @@ public class StageService {
             return;
         }
 
-        // 임시 포지션으로 설정(중복 문제 해결)
-        movedStage.updatePosition(0);
-        stageAdapter.save(movedStage);
-
         // 포지션 이동
         if (newSequenceNum < currentSequenceNumber) {
             for (Stage stage : stages) {
