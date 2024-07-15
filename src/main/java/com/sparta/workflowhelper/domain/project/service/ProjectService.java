@@ -12,6 +12,7 @@ import com.sparta.workflowhelper.domain.project.repository.ProjectRepository;
 import com.sparta.workflowhelper.domain.user.adapter.UserAdapter;
 import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.domain.user.repository.UserRepository;
+import com.sparta.workflowhelper.global.exception.customexceptions.globalexceptions.UserAlreadyExistsException;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.transaction.Transactional;
 
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProjectService {
 
-    private final ProjectMemberRepository projectMemberRepository;
     private final ProjectAdapter projectAdapter;
     private final ProjectMemberAdapter projectMemberAdapter;
     private final UserAdapter userAdapter;
@@ -93,8 +93,7 @@ public class ProjectService {
 
         // 이미 프로젝트에 참가한 유저인지 확인
         if (projectMemberAdapter.existsByProjectAndUser(project, user)) {
-            log.info("해당 유저는 이미 프로젝트에 참가중입니다.");
-            return null;
+            throw new UserAlreadyExistsException("해당하는 유저는 이미 프로젝트에 참가중입니다.");
         }
         ProjectMember projectMember = ProjectMember.of(user, project);
         projectMemberAdapter.save(projectMember);
