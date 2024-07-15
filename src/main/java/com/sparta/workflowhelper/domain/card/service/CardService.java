@@ -205,9 +205,8 @@ public class CardService {
 
         List<Card> cardList = cardQueryRepository.findAllCardByStageId(stage.getId());
 
-        Integer newPosition = requestDto.getNewPosition();
-
         Integer oldPosition = moveCard.getPosition();
+        Integer newPosition = requestDto.getNewPosition();
 
         if (newPosition > oldPosition) { // 카드가 아래로 이동할 경우
             for (Card card : cardList) {
@@ -243,13 +242,9 @@ public class CardService {
         List<Worker> workerList = new ArrayList<>();
 
         for (Long inputUserId : inputUserIdSet) {
-
             User workerUser = userAdapter.findById(inputUserId);
-
             Worker worker = Worker.createdWorker(workerUser, card);
-
             worker.addWorkerInCard(card);
-
             workerList.add(worker);
         }
 
