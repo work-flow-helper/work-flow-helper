@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Workflow Helper - 회원가입</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      width: 350px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+      font-size: 32px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #777;
+      font-size: 18px;
+    }
+
+    input[type='text'],
+    input[type='password'],
+    input[type='email'] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      box-sizing: border-box;
+    }
+
+    button.signup-btn {
+      background-color: #000;
+      color: white;
+    }
+
+    button.signup-btn:hover {
+      background-color: #333;
+    }
+
+    .checkbox-group {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .checkbox-group label {
+      font-size: 16px;
+      color: #777;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Workflow Helper</h1>
+  <h2>회원가입</h2>
+  <input id="username" placeholder="4글자 이상 10글자 이하 영문 소문자, 숫자" type="text"/>
+  <input id="password" placeholder="8글자 이상 대소문자, 숫자, 특수문자 조합" type="password"/>
+  <input id="nickname" placeholder="2글자에서 10글자 이하 영문, 한글" type="text"/>
+  <input id="email" placeholder="email 형식 입력" type="email"/>
+
+  <div class="checkbox-group">
+    <input id="adminCheckbox" onclick="toggleAdminCodeInput()" type="checkbox"/>
+    <label for="adminCheckbox">혹시 매니저?</label>
+  </div>
+  <input class="hidden" id="admincode" placeholder="매니저 code를 입력해주세요" type="text"/>
+  <div class="button-group">
+    <button class="signup-btn" onclick="signup()" type="button">회원가입</button>
+  </div>
+</div>
+
+<script>
+  function signup() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const nickname = document.getElementById('nickname').value;
+    const email = document.getElementById('email').value;
+
+    const usernameRegex = /^[a-z0-9]{4,10}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    const nicknameRegex = /^[a-zA-Z가-힣]{2,10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!username) {
+      alert('아이디를 입력하세요.');
+      return;
+    }
+
+    if (!usernameRegex.test(username)) {
+      alert('아이디는 4글자 이상 10글자 이하의 영문 소문자와 숫자로 구성되어야 합니다.');
+      return;
+    }
+
+    if (!password) {
+      alert('비밀번호를 입력하세요.');
+      return;
+    }
+
+    if (!passwordRegex.test(password)) {
+      alert('비밀번호는 8글자 이상 대소문자, 숫자, 특수문자가 포함되어야 합니다.');
+      return;
+    }
+
+    if (!nickname) {
+      alert('닉네임을 입력하세요.');
+      return;
+    }
+
+    if (!nicknameRegex.test(nickname)) {
+      alert('닉네임은 2글자 이상 10글자 이하의 영문 또는 한글로 구성되어야 합니다.');
+      return;
+    }
+
+    if (!email) {
+      alert('이메일을 입력하세요.');
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      alert('이메일 형식이 올바르지 않습니다.');
+      return;
+    }
+
+    alert('회원가입 완료.');
+    window.location.href = 'index.html';
+  }
+
+  function toggleAdminCodeInput() {
+    var adminCheckbox = document.getElementById('adminCheckbox');
+    var adminCodeInput = document.getElementById('admincode');
+    if (adminCheckbox.checked) {
+      adminCodeInput.classList.remove('hidden');
+    } else {
+      adminCodeInput.classList.add('hidden');
+    }
+  }
+</script>
+</body>
+</html>

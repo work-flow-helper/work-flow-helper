@@ -4,11 +4,7 @@ import com.sparta.workflowhelper.global.common.enums.UserRole;
 import com.sparta.workflowhelper.global.exception.customexceptions.TokenExpiredException;
 import com.sparta.workflowhelper.global.exception.customexceptions.TokenInvalidException;
 import com.sparta.workflowhelper.global.exception.errorcodes.TokenErrorCode;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
@@ -66,14 +62,15 @@ public class JwtProvider {
             .compact();
     }
 
-    public String createdRefreshToken() {
+    public String createdRefreshToken(String username) {
         Date date = new Date();
 
         return BEARER_PREFIX + Jwts.builder()
-            .setIssuedAt(date)
-            .setExpiration(new Date((date.getTime() + jwtRefreshExpiration)))
-            .signWith(key, signatureAlgorithm)
-            .compact();
+                .setSubject(username) // 여기에 실제 사용자 이름을 설정합니다.
+                .setIssuedAt(date)
+                .setExpiration(new Date((date.getTime() + jwtRefreshExpiration)))
+                .signWith(key, signatureAlgorithm)
+                .compact();
     }
 
     public String getJwtFromHeader(HttpServletRequest request, String headerName) {

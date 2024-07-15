@@ -69,6 +69,43 @@ Content-Type: application/json
   client.global.set("X-Refresh-Token", response.headers.valueOf("X-Refresh-Token"));
 %}
 
+### 스테이지 등록
+POST http://localhost:8080/api/stages
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "projectId": 1,
+  "title": "스테이지 제목zzzzzzzz"
+}
+
+### 스테이지 전체 조회
+GET http://localhost:8080/api/stages/projects/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 스테이지 수정
+PUT http://localhost:8080/api/stages/3
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "title": "수정된 스테이지 제목"
+}
+
+### 스테이지 순서 이동
+PUT http://localhost:8080/api/stages/3/position
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "position": 2
+}
+
+### 스테이지 삭제
+DELETE http://localhost:8080/api/stages/9
+Content-Type: application/json
+Authorization: {{Authorization}}
 
 ### 카드 생성
 POST http://localhost:8080/api/cards
@@ -131,6 +168,36 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "stageId": 1,
-  "newPosition": 5
+  "stageId": 3,
+  "newPosition": 1
 }
+
+### 댓글 생성
+POST http://localhost:8080/api/comments
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "cardId": 1,
+  "content": "댓글내용"
+}
+
+### 댓글 전체 조회
+GET http://localhost:8080/api/comments
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+### 댓글 수정
+PUT http://localhost:8080/api/comments/1
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "content": "수정된 댓글내용",
+  "cardId": 1
+}
+
+### 댓글 삭제
+DELETE http://localhost:8080/api/comments/1
+Content-Type: application/json
+Authorization: {{Authorization}}

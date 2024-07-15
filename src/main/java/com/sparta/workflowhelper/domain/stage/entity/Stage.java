@@ -30,10 +30,10 @@ public class Stage extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Integer position;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,4 +43,25 @@ public class Stage extends TimeStamped {
     @OneToMany(mappedBy = "stage", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Card> cards = new ArrayList<>();
 
+    // 정적 팩토리 메서드를 사용하도록 하기 위한 private 생성자
+    private Stage(String title, Integer position, Project project) {
+        this.title = title;
+        this.position = position;
+        this.project = project;
+    }
+
+    // 새로운 Stage 인스턴스를 생성하는 정적 팩토리 메서드
+    public static Stage createdStage(String title, Integer position, Project project) {
+        return new Stage(title, position, project);
+    }
+
+    // Stage의 제목을 수정하는 메서드
+    public void updateStage(String title) {
+        this.title = title;
+    }
+
+    // Stage의 위치를 수정하는 메서드
+    public void updatePosition(Integer position) {
+        this.position = position;
+    }
 }
