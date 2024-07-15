@@ -7,7 +7,9 @@ import com.sparta.workflowhelper.domain.project.service.ProjectService;
 import com.sparta.workflowhelper.global.common.dto.CommonResponseDto;
 import com.sparta.workflowhelper.global.security.UserDetailsImpl;
 import jakarta.validation.constraints.Null;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,13 +117,13 @@ public class ProjectController {
     @PostMapping("/projects/{projectId}/members")
     public ResponseEntity<CommonResponseDto<ProjectResponseDto>> addProjectMember(
             @PathVariable Long projectId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+            @RequestBody ProjectRequestDto projectRequestDto) {
         return ResponseEntity
-                .status(204)
+                .status(201)
                 .body(CommonResponseDto.of(
                         HttpStatus.CREATED.value(),
                         "프로젝트 멤버 등록",
-                        projectService.addProjectMember(projectId, userDetails)
+                        projectService.addProjectMember(projectId, projectRequestDto.getUserIdList())
                         // ProjectMemberRepository Method add in findByProjectIdAndUserId
                 ));
     }

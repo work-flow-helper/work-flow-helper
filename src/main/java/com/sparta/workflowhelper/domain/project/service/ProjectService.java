@@ -84,17 +84,21 @@ public class ProjectService {
         projectAdapter.deletedProjectMethod(projectId);
     }
 
-    public ProjectResponseDto addProjectMember(Long projectId, UserDetailsImpl userDetails) {
+    public ProjectResponseDto addProjectMember(Long projectId, List<Long> userIdList) {
         Project project = projectAdapter.findById(projectId);
-        User user = userAdapter.findById(userDetails.getUser().getId());
-
-        // 이미 프로젝트에 참가한 유저인지 확인
-        if (projectMemberAdapter.existsByProjectAndUser(project, user)) {
-            throw new UserAlreadyExistsException("해당하는 유저는 이미 프로젝트에 참가중입니다.");
+        List<String> addUserList = new ArrayList<>();
+        for (Long UserId : userIdList) {
+            // 닉네임에 해당하는 유저
+            User user = userAdapter.findById(UserId);
+            addUserList.add(user.getNickname());
+            if (projectMemberAdapter.existsByProjectAndUser(project, user)) {
+                log.info("{} 님은 해당 프로젝트에 참여중입니다", user.getUsername());
+                continue;
+            }
+            ProjectMember projectMember = ProjectMember.of(user, project);
+            projectMemberAdapter.save(projectMember);
         }
-        ProjectMember projectMember = ProjectMember.of(user, project);
-        projectMemberAdapter.save(projectMember);
-        return ProjectResponseDto.memberOf(projectId, user.getNickname());
+        return ProjectResponseDto.memberOf(projectId, addUserList);
     }
 
     public void deleteProjectMember(Long projectId, Long memberId) {
