@@ -37,13 +37,14 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
             authorizeHttpRequests
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .permitAll()
-                .requestMatchers("/api/auth/sign-up").permitAll()
-                .requestMatchers("/api/auth/lonin").permitAll()
-                .requestMatchers("/api/auth/refresh").permitAll()
-                .requestMatchers(HttpMethod.GET).permitAll()
-                .anyRequest().authenticated()
+                    .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                    .permitAll()
+                    .requestMatchers("/api/auth/sign-up").permitAll()
+                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/auth/refresh").permitAll()
+                    .requestMatchers(HttpMethod.GET).permitAll()
+                    .requestMatchers("api/**").permitAll()  // 테스트용! 테스트 후 다시 주석
+                    .anyRequest().authenticated()
         ).authenticationProvider(authenticationProvider);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

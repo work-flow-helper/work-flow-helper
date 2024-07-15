@@ -1,8 +1,8 @@
 ---
 name: bug fix 템플릿
 about: 버그 수정 템플릿
-title: "[BUG]"
-labels: ''
+title: "[BUG] 버그내용을 적어주세요"
+labels: "\U0001F41Ebug, \U0001F527fix"
 assignees: ''
 
 ---

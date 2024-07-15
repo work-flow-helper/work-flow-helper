@@ -13,16 +13,19 @@ public class UserAdapter {
 
     private final UserRepository userRepository;
 
+    public User findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(
+                        NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
+    }
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
+                .orElseThrow(() -> new UserNotFoundException(
+                        NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
     }
 
     public User save(User user) {
         return userRepository.save(user);
-    }
-
-    public User findById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(NotFoundErrorCode.NOT_FOUND_USER_ENTITY.getMessage()));
     }
 }

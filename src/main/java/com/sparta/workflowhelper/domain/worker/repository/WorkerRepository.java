@@ -1,5 +1,8 @@
 package com.sparta.workflowhelper.domain.worker.repository;
 
-public class WorkerRepository {
+import com.sparta.workflowhelper.domain.worker.entity.Worker;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface WorkerRepository extends JpaRepository<Worker, Long> {
 
 }
