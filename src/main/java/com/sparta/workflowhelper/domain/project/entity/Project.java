@@ -2,8 +2,6 @@ package com.sparta.workflowhelper.domain.project.entity;
 
 
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
-import com.sparta.workflowhelper.domain.project.dto.ProjectResponseDto;
-import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.common.entity.TimeStamped;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,10 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

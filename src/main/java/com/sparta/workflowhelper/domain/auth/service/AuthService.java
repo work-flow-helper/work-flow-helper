@@ -43,7 +43,8 @@ public class AuthService {
     public AuthResponseDto signUp(AuthRequestDto requestDto) {
         // 중복된 username 확인
         if (authAdapter.existsByUsername(requestDto.getUsername())) {
-            throw new UserDuplicateException(UserDuplicateErrorCode.DUPLICATE_USERNAME.getMessage());
+            throw new UserDuplicateException(
+                    UserDuplicateErrorCode.DUPLICATE_USERNAME.getMessage());
         }
 
         UserStatus status = UserStatus.ACTIVE;
@@ -54,17 +55,21 @@ public class AuthService {
             if (adminCode.equals(requestDto.getAdminCode())) {
                 role = UserRole.MANAGER;
             } else {
-                throw new InvalidAdminCodeException(InvalidAdminCodeErrorCode.INVALID_ADMIN_CODE.getMessage());  // Forbidden error
+                throw new InvalidAdminCodeException(
+                        InvalidAdminCodeErrorCode.INVALID_ADMIN_CODE.getMessage());  // Forbidden error
             }
         }
 
-        User user = User.createdUser(requestDto.getUsername(), passwordEncoder.encode(requestDto.getPassword()), requestDto.getNickname(), requestDto.getEmail(), status, role);
+        User user = User.createdUser(requestDto.getUsername(),
+                passwordEncoder.encode(requestDto.getPassword()), requestDto.getNickname(),
+                requestDto.getEmail(), status, role);
 
         User savedUser = authAdapter.save(user);
 
         return AuthResponseDto.of(savedUser.getId(), savedUser.getNickname(), savedUser.getEmail());
     }
 
+    @Transactional
     public void login(LoginRequestDto requestDto, HttpServletResponse response) {
 
         User user = authAdapter.findByUsername(requestDto.getUsername());
@@ -72,23 +77,13 @@ public class AuthService {
         user.checkUserWithdrawn();
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
+                new UsernamePasswordAuthenticationToken(requestDto.getUsername(),
+                        requestDto.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserRole role = user.getUserRole();
-
-        String jwtAccessToken = jwtProvider.createdAccessToken(requestDto.getUsername(), role);
-
-        String jwtRefreshToken = jwtProvider.createdRefreshToken(requestDto.getUsername());
-
-        user.updateRefreshToken(jwtRefreshToken);
-        authAdapter.save(user);
-
-        response.setHeader(JwtProvider.ACCESS_HEADER, jwtAccessToken);
-        response.setHeader(JwtProvider.REFRESH_HEADER, jwtRefreshToken);
-
+        issueTokenAndSave(response, user);
     }
 
     public void withdraw(HttpServletRequest request) {
@@ -126,6 +121,7 @@ public class AuthService {
 
     }
 
+    @Transactional
     public void tokenReissue(HttpServletRequest request, HttpServletResponse response) {
 
         String refreshToken = jwtProvider.getJwtFromHeader(request, JwtProvider.REFRESH_HEADER);
@@ -145,9 +141,9 @@ public class AuthService {
         issueTokenAndSave(response, user);
     }
 
-    @Transactional
-    public void issueTokenAndSave(HttpServletResponse response, User user) {
-        String newAccessToken = jwtProvider.createdAccessToken(user.getUsername(), user.getUserRole());
+    private void issueTokenAndSave(HttpServletResponse response, User user) {
+        String newAccessToken = jwtProvider.createdAccessToken(user.getUsername(),
+                user.getUserRole());
         String newRefreshToken = jwtProvider.createdRefreshToken(user.getUsername());
 
         user.updateRefreshToken(newRefreshToken);
