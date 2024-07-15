@@ -2,6 +2,8 @@ package com.sparta.workflowhelper.domain.mapping.adapter;
 
 import com.sparta.workflowhelper.domain.mapping.entity.ProjectMember;
 import com.sparta.workflowhelper.domain.mapping.repository.ProjectMemberRepository;
+import com.sparta.workflowhelper.domain.project.entity.Project;
+import com.sparta.workflowhelper.domain.user.entity.User;
 import com.sparta.workflowhelper.global.exception.customexceptions.ProjectMemberNotFoundException;
 import com.sparta.workflowhelper.global.exception.errorcodes.NotFoundErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +28,19 @@ public class ProjectMemberAdapter {
 
     public void saveAll(List<ProjectMember> projectMemberList) {
         projectMemberRepository.saveAll(projectMemberList);
+    }
+
+    public boolean existsByProjectAndUser(Project project, User user) {
+        return projectMemberRepository.existsByProjectAndUser(project, user);
+    }
+
+    public void delete(ProjectMember projectMember) {
+        projectMemberRepository.delete(projectMember);
+    }
+
+
+    public ProjectMember findByProjectIdAndUserId(Long projectId, Long memberId) {
+        return projectMemberRepository.findByProjectIdAndUserId(projectId,
+                memberId).orElseThrow(() -> new RuntimeException("해당 유저 없음"));
     }
 }

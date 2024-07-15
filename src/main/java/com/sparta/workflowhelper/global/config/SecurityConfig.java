@@ -43,7 +43,10 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/login").permitAll()
                                 .requestMatchers("/api/auth/refresh").permitAll()
                                 .requestMatchers(HttpMethod.GET).permitAll()
-//                    .requestMatchers("/api/**").permitAll()  // 테스트용! 테스트 후 다시 주석
+                                .requestMatchers(HttpMethod.POST, "/api/projects/**").hasRole("MANAGER") // POST 메서드 MANAGER 권한 설정
+                                .requestMatchers(HttpMethod.PUT, "/api/projects/**").hasRole("MANAGER") // PUT 메서드 MANAGER 권한 설정
+                                .requestMatchers(HttpMethod.DELETE, "/api/projects/**").hasRole("MANAGER") // DELETE 메서드 MANAGER 권한 설정
+//                        .requestMatchers("/api/**").permitAll()  // 테스트용! 테스트 후 다시 주석
                                 .anyRequest().authenticated()
         ).authenticationProvider(authenticationProvider);
 
