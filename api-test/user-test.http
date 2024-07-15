@@ -114,7 +114,7 @@ Authorization: {{Authorization}}
 Content-Type: application/json
 
 {
-  "stageId": 1,
+  "stageId": 3,
   "title": "테스트",
   "content": "내용"
 }
@@ -180,7 +180,7 @@ Authorization: {{Authorization}}
 
 {
   "cardId": 1,
-  "content": "댓글내zzzzz용"
+  "content": "댓글내용"
 }
 
 ### 댓글 전체 조회
